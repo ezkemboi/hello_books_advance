@@ -1,0 +1,23 @@
+#nav-bg {
+    background-color: #e3f2fd;
+}
+
+#nav-bg1 {
+    background-color: #F5F27F;
+    color: black;
+}
+.media img {
+    max-width: 120px;
+    height: auto;
+}
+.carousel-caption {
+    top: 200px;
+}
+.carousel-inner img {
+    height: 500px;
+
+}
+.carousel-inner h1 {
+    color: #7A0FC8;
+    font-weight: 600;
+}
