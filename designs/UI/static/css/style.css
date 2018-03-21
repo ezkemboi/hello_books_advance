@@ -1,7 +1,10 @@
 #nav-bg {
     background-color: #e3f2fd;
 }
-
+.d-inline.mx-auto.center {
+    text-align: center !important;
+    display: block !important;
+}
 #nav-bg1 {
     background-color: #F5F27F;
     color: black;
