@@ -94,6 +94,37 @@ class AdminTestCase(unittest.TestCase):
         )
         self.assertIn('The Beautiful Girl 1', str(results.data))
 
+    def test_delete_book(self):
+        """
+        Tests the delete of existing book using DELETE request.
+        :return: delete_book
+        """
+        rv = self.client().post(
+            '/admin/api/v1/add_book',
+            data={
+                'book_title': 'The Beautiful Girl',
+                'authors': ['Kimani John'],
+                'publisher': 'The Kenya Publishers',
+                'year': 2015,
+                'isnb': 1233 - 13332 - 223
+            }
+        )
+        self.assertEqual(rv.status_code, 201)
+        # Get json book in json
+        results = json.loads(rv.data.decode())  # decodes the stored data using loads.
+
+        # Try delete book
+        res = self.client().delete(
+            '/admin/api/v1/delete_book/<int:bookId>'.format(results['id']),
+        )
+        self.assertEqual(res.status_code, 200)
+
+        # test that it has been deleted, 404 error
+        result = self.client().get(
+            '/admin/api/v1/delete_book/1',
+        )
+        self.assertEqual(result.status_code, 404)
+
 
 if __name__ == '__main__':
     unittest.main()
