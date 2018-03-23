@@ -26,20 +26,20 @@ class AdminTestCase(unittest.TestCase):
         self.add_book_data = {
             'book_title': 'The Wonder Boy',
             'authors': ['john doe', 'doe Jacob'],  # make sure authors is a list
-            'publisher': 'Longhorn',
+            'publisher': 'Longhorn Publishers',
             'year': 2006,
             'isnb': 23-1223322-233
         }
 
     # Helpers goes here
     def add_book(self, book_title: 'The Wonder Boy', authors: ['john doe', 'doe Jacob'],
-                 publisher: 'Longhorn', year: 2006, isnb: 23-1223322-233):
+                 publisher: 'Longhorn Publisher', year: 2006, isnb: 23-1223322-233):
         add_book_data = {
             'book_title': book_title,
             'authors': authors,
             'publisher': publisher,
             'year': year,
-            'ISNB': isnb
+            'isnb': isnb
         }
         return self.client().post('/admin/api/v1/add_book', data=add_book_data)
 
@@ -54,6 +54,45 @@ class AdminTestCase(unittest.TestCase):
         # make an assert of the success addition of books
         self.assertEqual(result['message'], "Admin added book successfully.")
         self.assertEqual(res.status_code, 201)
+
+    def test_edit_book(self):
+        """
+        Tests for admin ability to edit book
+        :return: edit_book
+        """
+        # add a book first by making a POST request
+        rv = self.client().post(
+            '/admin/api/v1/add_book',
+            data={
+                'book_title': 'The Beautiful Girl',
+                'authors': ['Kimani John'],
+                'publisher': 'The Kenya Publishers',
+                'year': 2015,
+                'isnb': 1233-13332-223
+            }
+        )
+        self.assertEqual(rv.status_code, 201)
+
+        # receive the json add book data
+        results = json.loads(rv.data.decode())
+        # Try editing the added book by making the put request
+        rv = self.client().put(
+            '/admin/api/v1/edit_book/<int:bookId>'.format(results['id']),
+            data={
+                'book_title': 'The Beautiful Girl 1',
+                'authors': ['Kimani John', 'Jack Nick'],
+                'publisher': 'The Kenya Publishers',
+                'year': 2016,
+                'isnb': 1234 - 13332 - 223
+            }
+        )
+        self.assertEqual(rv.status_code, 200)
+
+        # get edited book
+        results = self.client().get(
+            '/admin/api/v1/edit_book/<int:bookId>'.format(results['id'])
+        )
+        self.assertIn('The Beautiful Girl 1', str(results.data))
 
 
 if __name__ == '__main__':
