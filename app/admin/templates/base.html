@@ -1,10 +1,222 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
+    {% block head %}
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/style.css" type="text/css">
+
+    <title>{% block title %}{% endblock%}</title>
+    {% endblock %}
 </head>
 <body>
-$END$
+<div class="container-fluid">
+    <nav class="navbar navbar-light" id="nav-bg">
+        <a class="navbar-brand" href="#">
+            <img src="static/img/logo.jpg" width="30" height="30" class="d-inline-block align-top"
+                 alt="hello books logo">
+            Hello Books
+        </a>
+        <ul class="nav justify-content-end">
+            <li class="nav-item">
+                <button type="button" class="btn btn-primary">
+                    Messages <span class="badge badge-light">4</span>
+                </button>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                   aria-expanded="false">Menu</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Messages</a>
+                    <a class="dropdown-item" href="#">Add Book</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item bg-success" href="#">All Users</a>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">All Books</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="row" id="row-1">
+        <div class="col-sm-3">
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src="static/img/user1.png" alt="admin image">
+                <div class="card-body">
+                    <h5 class="card-title"><b>My Profile</b></h5>
+                    <p class="card-text"><b>Description: </b>I am a professional librarian.</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Name:</b> Admin Number</li>
+                    <li class="list-group-item"><b>Email:</b> admin@gmail.com</li>
+                    <li class="list-group-item"><b>Username:</b> Admin</li>
+                    <li class="list-group-item"><b>D.O.B:</b> 01/01/1980</li>
+                    <li class="list-group-item"><b>Institution:</b> Kenyatta University</li>
+                    <li class="list-group-item"><b>Profession:</b> Librarian</li>
+                    <li class="list-group-item"><b>Tel No:</b> +25472434324223</li>
+                    <li class="list-group-item"><b>City:</b> Nairobi</li>
+                </ul>
+
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div id="accordion">
+                <div class="card">
+                    <div class="card-header" id="headingOne">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                Add Book
+                            </button>
+                        </h5>
+                    </div>
+
+                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="formGroupExampleInput">Book Title: </label>
+                                <input type="text" class="form-control" id="formGroupExampleInput"
+                                       placeholder="Book Authors">
+                            </div>
+                            <div class="form-group">
+                                <label for="formGroupExampleInput">Authors: </label>
+                                <input type="text" class="form-control" id="formGroupExampleInput"
+                                       placeholder="Enter Authors">
+                            </div>
+                            <div class="form-group">
+                                <label for="formGroupExampleInput">Publisher: </label>
+                                <input type="text" class="form-control" id="formGroupExampleInput"
+                                       placeholder="Enter Publisher">
+                            </div>
+                            <div class="form-group">
+                                <label for="formGroupExampleInput">Year: </label>
+                                <input type="text" class="form-control" id="formGroupExampleInput"
+                                       placeholder="Enter Year">
+                            </div>
+                            <div class="form-group">
+                                <label for="formGroupExampleInput">ISNB: </label>
+                                <input type="text" class="form-control" id="formGroupExampleInput"
+                                       placeholder="Enter ISNB">
+                            </div>
+                            <div class="d-inline mx-auto center">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-4">
+                <h1 class="text-center">All Library Books</h1>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Book Title</th>
+                        <th scope="col">Authors</th>
+                        <th scope="col">Publisher</th>
+                        <th scope="col">Year</th>
+                        <th scope="col">ISNB</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Milk and Honey</td>
+                        <td>Rupi Kaur</td>
+                        <td>Andrews McMeel Publishing</td>
+                        <td>2005</td>
+                        <td>1449478654, 9781449478650</td>
+                        <td>
+                            <button type="button" class="btn btn-success">Edit</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">2</th>
+                        <td>When it Comes to Love: a collection of poems</td>
+                        <td>Rama Kaba</td>
+                        <td>Zircon Press</td>
+                        <td>2015</td>
+                        <td>098094323X, 9780980943238</td>
+                        <td>
+                            <button type="button" class="btn btn-success">Edit</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td>Algorithms to Live By: The Computer Science of Human Decisions</td>
+                        <td>Brian Christian, Tom Griffiths</td>
+                        <td>HarperCollins Publishers Limited</td>
+                        <td>2016</td>
+                        <td>0007547978, 9780007547975</td>
+                        <td>
+                            <button type="button" class="btn btn-success">Edit</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td>Algorithms to Live By: The Computer Science of Human Decisions</td>
+                        <td>Brian Christian, Tom Griffiths</td>
+                        <td>HarperCollins Publishers Limited</td>
+                        <td>2016</td>
+                        <td>0007547978, 9780007547975</td>
+                        <td>
+                            <button type="button" class="btn btn-success">Edit</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td>Algorithms to Live By: The Computer Science of Human Decisions</td>
+                        <td>Brian Christian, Tom Griffiths</td>
+                        <td>HarperCollins Publishers Limited</td>
+                        <td>2016</td>
+                        <td>0007547978, 9780007547975</td>
+                        <td>
+                            <button type="button" class="btn btn-success">Edit</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td>Algorithms to Live By: The Computer Science of Human Decisions</td>
+                        <td>Brian Christian, Tom Griffiths</td>
+                        <td>HarperCollins Publishers Limited</td>
+                        <td>2016</td>
+                        <td>0007547978, 9780007547975</td>
+                        <td>
+                            <button type="button" class="btn btn-success">Edit</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </body>
 </html>
