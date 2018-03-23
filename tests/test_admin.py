@@ -41,14 +41,14 @@ class AdminTestCase(unittest.TestCase):
             'year': year,
             'isnb': isnb
         }
-        return self.client().post('/admin/api/v1/add_book', data=add_book_data)
+        return self.client().post('/api/v1/books', data=add_book_data)
 
     def test_add_book(self):
         """
         Test that admin should add book
         :return: add_book_data
         """
-        res = self.client().post('/admin/api/v1/add_book', data=self.add_book_data)
+        res = self.client().post('/api/v1/books', data=self.add_book_data)
         # Getting the results
         result = json.loads(res.data.decode())
         # make an assert of the success addition of books
@@ -62,7 +62,7 @@ class AdminTestCase(unittest.TestCase):
         """
         # add a book first by making a POST request
         rv = self.client().post(
-            '/admin/api/v1/add_book',
+            '/api/v1/books',
             data={
                 'book_title': 'The Beautiful Girl',
                 'authors': ['Kimani John'],
@@ -77,7 +77,7 @@ class AdminTestCase(unittest.TestCase):
         results = json.loads(rv.data.decode())
         # Try editing the added book by making the put request
         rv = self.client().put(
-            '/admin/api/v1/edit_book/<int:bookId>'.format(results['id']),
+            '/api/v1/books/{}'.format(results['id']),
             data={
                 'book_title': 'The Beautiful Girl 1',
                 'authors': ['Kimani John', 'Jack Nick'],
@@ -90,7 +90,7 @@ class AdminTestCase(unittest.TestCase):
 
         # get edited book
         results = self.client().get(
-            '/admin/api/v1/edit_book/<int:bookId>'.format(results['id'])
+            '/api/v1/books/{}'.format(results['id'])
         )
         self.assertIn('The Beautiful Girl 1', str(results.data))
 
@@ -100,7 +100,7 @@ class AdminTestCase(unittest.TestCase):
         :return: delete_book
         """
         rv = self.client().post(
-            '/admin/api/v1/add_book',
+            '/api/v1/books',
             data={
                 'book_title': 'The Beautiful Girl',
                 'authors': ['Kimani John'],
@@ -115,13 +115,13 @@ class AdminTestCase(unittest.TestCase):
 
         # Try delete book
         res = self.client().delete(
-            '/admin/api/v1/delete_book/<int:bookId>'.format(results['id']),
+            '/api/v1/books/{}'.format(results['id']),
         )
         self.assertEqual(res.status_code, 200)
 
         # test that it has been deleted, 404 error
         result = self.client().get(
-            '/admin/api/v1/delete_book/1',
+            '/api/v1/books/1',
         )
         self.assertEqual(result.status_code, 404)
 
