@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9638830e-1851-49c8-b6c9-e23bade4c8bf" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_admin.py" afterPath="$PROJECT_DIR$/tests/test_admin.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/test_auth.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/tests/test_user.py" afterPath="" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,14 +18,24 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="test_admin.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="test_admin.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/test_admin.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="603">
-              <caret line="142" column="0" lean-forward="true" selection-start-line="142" selection-start-column="0" selection-end-line="142" selection-end-column="0" />
+            <state relative-caret-position="90">
+              <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test_auth.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/tests/test_auth.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -66,8 +77,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Unit Test" />
         <option value="HTML File" />
+        <option value="Python Unit Test" />
       </list>
     </option>
   </component>
@@ -97,6 +108,7 @@
         <option value="$PROJECT_DIR$/config.py" />
         <option value="$PROJECT_DIR$/app/admin/views.py" />
         <option value="$PROJECT_DIR$/tests/test_admin.py" />
+        <option value="$PROJECT_DIR$/tests/test_auth.py" />
       </list>
     </option>
   </component>
@@ -161,46 +173,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hello_books" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hello_books" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="admin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hello_books" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hello_books" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="admin" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="templates" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
       <pane id="Scope" />
@@ -211,7 +183,7 @@
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="last_opened_file_path" value="$USER_HOME$/flaskapps/employeemgt" />
   </component>
-  <component name="RunManager" selected="Python tests.Nosetests in test_admin">
+  <component name="RunManager" selected="Python tests.Nosetests in test_auth">
     <configuration default="false" name="Nosetests in test_admin" type="tests" factoryName="Nosetests" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -223,6 +195,27 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="hello_books" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/test_admin.py" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="PARAMS" value="" />
+      <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="Nosetests in test_auth" type="tests" factoryName="Nosetests" temporary="true" nameIsGenerated="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="hello_books" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/test_auth.py" />
       <option name="CLASS_NAME" value="" />
       <option name="METHOD_NAME" value="" />
       <option name="FOLDER_NAME" value="" />
@@ -367,12 +360,14 @@
       <option name="USE_KEYWORD" value="false" />
       <method />
     </configuration>
-    <list size="1">
+    <list size="2">
       <item index="0" class="java.lang.String" itemvalue="Python tests.Nosetests in test_admin" />
+      <item index="1" class="java.lang.String" itemvalue="Python tests.Nosetests in test_auth" />
     </list>
     <recent_temporary>
-      <list size="1">
-        <item index="0" class="java.lang.String" itemvalue="Python tests.Nosetests in test_admin" />
+      <list size="2">
+        <item index="0" class="java.lang.String" itemvalue="Python tests.Nosetests in test_auth" />
+        <item index="1" class="java.lang.String" itemvalue="Python tests.Nosetests in test_admin" />
       </list>
     </recent_temporary>
   </component>
@@ -401,6 +396,21 @@
     </history-entry>
     <history-entry file="Nosetests_in_test_admin - 2018.03.23 at 17h 27m 01s.xml">
       <configuration name="Nosetests in test_admin" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Nosetests_in_test_admin - 2018.03.23 at 18h 08m 43s.xml">
+      <configuration name="Nosetests in test_admin" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Nosetests_in_test_admin - 2018.03.23 at 18h 08m 56s.xml">
+      <configuration name="Nosetests in test_admin" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Nosetests_in_test_admin - 2018.03.23 at 18h 09m 09s.xml">
+      <configuration name="Nosetests in test_admin" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Nosetests_in_test_admin - 2018.03.23 at 18h 09m 21s.xml">
+      <configuration name="Nosetests in test_admin" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Nosetests_in_test_auth - 2018.03.23 at 18h 09m 29s.xml">
+      <configuration name="Nosetests in test_auth" configurationId="tests" />
     </history-entry>
   </component>
   <component name="ToolWindowManager">
@@ -437,8 +447,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/designs/UI/sign.html" />
-    <entry file="file://$PROJECT_DIR$/designs/UI/static/css/style.css" />
     <entry file="file://$PROJECT_DIR$/designs/UI/user_dashboard.html" />
     <entry file="file://$PROJECT_DIR$/designs/UI/signup.html" />
     <entry file="file://$PROJECT_DIR$/designs/UI/library_history.html" />
@@ -556,13 +564,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/tests/test_user.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/tests/test_admin.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="603">
-          <caret line="142" column="0" lean-forward="true" selection-start-line="142" selection-start-column="0" selection-end-line="142" selection-end-column="0" />
+        <state relative-caret-position="90">
+          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/test_auth.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
