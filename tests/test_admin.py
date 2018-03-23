@@ -27,9 +27,21 @@ class AdminTestCase(unittest.TestCase):
             'book_title': 'The Wonder Boy',
             'authors': ['john doe', 'doe Jacob'],  # make sure authors is a list
             'publisher': 'Longhorn',
-            'Year': 2006,
-            'ISNB': 23-1223322-233
+            'year': 2006,
+            'isnb': 23-1223322-233
         }
+
+    # Helpers goes here
+    def add_book(self, book_title: 'The Wonder Boy', authors: ['john doe', 'doe Jacob'],
+                 publisher: 'Longhorn', year: 2006, isnb: 23-1223322-233):
+        add_book_data = {
+            'book_title': book_title,
+            'authors': authors,
+            'publisher': publisher,
+            'year': year,
+            'ISNB': isnb
+        }
+        return self.client().post('/admin/api/v1/add_book', data=add_book_data)
 
     def test_add_book(self):
         """
