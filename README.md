@@ -4,7 +4,7 @@ Hello-Books is a simple application that helps manage a library and its processe
 
 # Code Integration and Testing
 
-[![Build Status](https://travis-ci.org/ezrqnkemboi/hello_books.svg?branch=master)](https://travis-ci.org/ezrqnkemboi/hello_books) [![Coverage Status](https://coveralls.io/repos/github/ezrqnkemboi/hello_books/badge.svg?branch=master)](https://coveralls.io/github/ezrqnkemboi/hello_books?branch=master)
+[![Build Status](https://travis-ci.org/ezrqnkemboi/hello_books.svg?branch=master)](https://travis-ci.org/ezrqnkemboi/hello_books) [![Maintainability](https://api.codeclimate.com/v1/badges/b92c5e43d5de4be7085b/maintainability)](https://codeclimate.com/github/ezrqnkemboi/hello_books/maintainability) [![Coverage Status](https://coveralls.io/repos/github/ezrqnkemboi/hello_books/badge.svg?branch=master)](https://coveralls.io/github/ezrqnkemboi/hello_books?branch=master)
 
 # Required Features
     Users can create an account and log in
