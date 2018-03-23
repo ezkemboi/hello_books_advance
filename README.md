@@ -1,10 +1,10 @@
 # hello_books
 
-     Hello-Books is a simple application that helps manage a library and its processes like stocking, tracking and renting
-     books. With this application users are able to find and rent books. The application also has an admin section where the
-     admin can do things like add books, delete books, increase the quantity of a book etc.
+Hello-Books is a simple application that helps manage a library and its processes like stocking, tracking and renting books. With this application users are able to find and rent books. The application also has an admin section where the admin can do things like add books, delete books, increase the quantity of a book etc.
 
 # Code Integration and Testing
+
+[![Build Status](https://travis-ci.org/ezrqnkemboi/hello_books.svg?branch=master)](https://travis-ci.org/ezrqnkemboi/hello_books) [![Coverage Status](https://coveralls.io/repos/github/ezrqnkemboi/hello_books/badge.svg?branch=master)](https://coveralls.io/github/ezrqnkemboi/hello_books?branch=master)
 
 # Required Features
     Users can create an account and log in
