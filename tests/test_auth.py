@@ -104,7 +104,15 @@ class AuthTestCase(unittest.TestCase):
         self.assertEqual(result['message'], "Invalid email or password, Please try again")
 
     def test_reset_password(self):
-        self.assertEqual(True, False)
+        user_data = {
+            "email": "test@example.com",
+            "password": "password12"
+        }
+        res = self.client().post('/api/v1/auth/reset-password', data=user_data)
+        # receive data in json format
+        result = json.loads(res.data.decode())
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(result['message'], "Reset Password Successful.")
 
     def test_logout(self):
         # call function for register
