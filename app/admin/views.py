@@ -51,6 +51,16 @@ class Books(object):
             return jsonify({'message': book[0]})
 
 
+class BorrowBook(object):
+    """
+    This class contains function that authenticated users can borrow books.
+    """
+    @auth.route('/api/v1/users/books/<bookId>', methods=['POST'])
+    def borrow_book(self, bookId):
+        for book in books:
+            return book
+        choose_book = request.json.get(bookId)
+        if bookId in books:
 
 
 
