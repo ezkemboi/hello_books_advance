@@ -124,6 +124,9 @@ class AuthTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual('Message', "Your logged out.")
 
+    def test_user_borrow_book(self):
+        res = self.client().post('/api/v1/users/books/')
+
 
 if __name__ == '__main__':
     unittest.main()
