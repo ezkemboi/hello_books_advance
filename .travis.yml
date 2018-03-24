@@ -26,7 +26,7 @@ env:
 
 # command to run tests
 script: true
-  - nosetests --with-coverage --coverage-package=app report
- 
+  - nosetests -v ./tests --with-coverage --cover-package=./app
+  
 after_script:
   - coveralls .coveragerc
