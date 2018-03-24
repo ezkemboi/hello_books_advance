@@ -31,3 +31,17 @@ class Auth(object):
                 users.append(user_details)
         return jsonify({"Message": "Email, Username and Password is required."})
 
+    @auth.route('/api/v1/auth/login', methods=['POST'])
+    def login(self):
+        email = request.json.get('email')
+        password = request.json.get('password')
+
+        for user in users:
+            if email == user_details['email']:
+                if password == user_details['password']:
+                    return jsonify({'message': "Successfully logged in."})
+                return jsonify({'message': "Wrong Password"})
+            return jsonify({'message': "Invalid email"})
+        return jsonify({'message': "Please enter email and password."})
+
+
