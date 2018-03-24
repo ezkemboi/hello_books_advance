@@ -1,7 +1,9 @@
-from flask import request, jsonify, abort
+from flask import request, jsonify
 
 # local imports
 from . import admin
+from app.home import home
+from app.auth import auth
 
 books = []
 book_details = {}
@@ -30,5 +32,26 @@ class Admin(object):
             books.append(book_details)
             return jsonify({'message': "Added the book successfully."})
         return jsonify({'message': "Fill all the details correctly."})
+
+
+class Books(object):
+    """
+    This class contain list of all books.
+    User can get all books or one book
+    access is through home blueprint, as admin, user and guest can access.
+    """
+    @home.route('/api/v1/books', methods=['GET'])
+    def get_books(self):
+        for book in books:
+            return jsonify({"message": book})
+
+    @home.route('/api/v1/books/<int:bookId>', methods=['GET'])
+    def get_a_book(self, bookId):
+        for book in books:
+            return jsonify({'message': book[0]})
+
+
+
+
 
 
