@@ -29,4 +29,4 @@ script: true
   - nosetests -v ./tests --with-coverage --cover-package=./app
   
 after_script:
-  - coveralls .coveragerc
+  - coveralls
