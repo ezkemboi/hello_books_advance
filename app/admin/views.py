@@ -33,6 +33,12 @@ class Admin(object):
             return jsonify({'message': "Added the book successfully."})
         return jsonify({'message': "Fill all the details correctly."})
 
+    @auth.route('/api/v1/books/<int:bookId>', methods=['DELETE'])
+    def remove_book(self, bookId):
+        for book in books:
+            book.delete()
+            return jsonify({'Deleted': bookId})
+
 
 class Books(object):
     """
@@ -43,12 +49,12 @@ class Books(object):
     @home.route('/api/v1/books', methods=['GET'])
     def get_books(self):
         for book in books:
-            return jsonify({"message": book})
+            return jsonify({book})
 
     @home.route('/api/v1/books/<int:bookId>', methods=['GET'])
     def get_a_book(self, bookId):
         for book in books:
-            return jsonify({'message': book[0]})
+            return jsonify({book: bookId})
 
 
 class BorrowBook(object):
@@ -60,7 +66,7 @@ class BorrowBook(object):
         for book in books:
             return book
         choose_book = request.json.get(bookId)
-        if bookId in books:
+        return jsonify({'message': "Borrowed " + str(choose_book)})
 
 
 
