@@ -1,5 +1,6 @@
 # global imports
 from flask import request, jsonify
+from flask_login import login_user, login_required, logout_user
 
 # local imports
 from . import auth
@@ -39,9 +40,19 @@ class Auth(object):
         for user in users:
             if email == user_details['email']:
                 if password == user_details['password']:
+                    # Call functionality to login the specified user in users list
+                    login_user(user)
                     return jsonify({'message': "Successfully logged in."})
                 return jsonify({'message': "Wrong Password"})
             return jsonify({'message': "Invalid email"})
         return jsonify({'message': "Please enter email and password."})
+
+    @auth.route('/api/v1/auth/logout', methods=['POST'])
+    @login_required
+    def logout(self):
+        # with help of flask_login module, call logout function
+        logout_user()
+        return jsonify({'message': "You have successfully logged out."})
+    
 
 
