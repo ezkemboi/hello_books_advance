@@ -53,6 +53,23 @@ class Auth(object):
         # with help of flask_login module, call logout function
         logout_user()
         return jsonify({'message': "You have successfully logged out."})
-    
+
+    @auth.route('/api/v1/auth/reset-password', methods=['POST'])
+    def reset_password(self):
+        # Fill the email
+        email = request.json.get('email')
+
+        # check if the email exist
+        if email in user_details['email']:
+            password = request.json.get('password')
+            if password < 8:
+                return jsonify({'message': "Password should be greater than 8"})
+            else:
+                user_details['email'] = email
+                user_details['password'] = password
+                users.append(user_details)
+                return jsonify({'message': "Password Reset successfully."})
+        # return message to show un-existing email
+        return jsonify({'message': 'The email does not exist.'})
 
 
