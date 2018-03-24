@@ -107,7 +107,14 @@ class AuthTestCase(unittest.TestCase):
         self.assertEqual(True, False)
 
     def test_logout(self):
-        pass
+        # call function for register
+        self.register()
+        # call function to login the user
+        self.login()
+        # Logout the user now
+        res = self.client().post('/api/v1/auth/logout')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual('Message', "Your logged out.")
 
 
 if __name__ == '__main__':
