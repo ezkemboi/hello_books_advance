@@ -22,7 +22,7 @@ env:
 
 # command to run tests
 script: true
-  - nosetests --with-coverage --coverage report
+  - nosetests --with-coverage --coverage-package=app report
  
 after_script:
-  - coveralls
+  - coveralls .coveragerc

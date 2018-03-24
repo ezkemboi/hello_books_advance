@@ -1,0 +1,10 @@
+[run]
+source =
+    app/
+    tests/
+
+[report]
+show_missing = True
+
+exclude_lines =
+    def __repr__
