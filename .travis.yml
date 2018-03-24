@@ -25,4 +25,4 @@ script: true
   - nosetests --with-coverage --coverage report
  
 after_script:
-  - coveralls
+  - coveralls .coveragerc
