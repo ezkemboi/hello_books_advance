@@ -1,15 +1,17 @@
-from flask import request, jsonify
+from flask import request, jsonify, Blueprint
+from flask_restful import Resource, Api
 
 # local imports
-from . import admin
-from app.home import home
-from app.auth import auth
+auth = Blueprint('auth', __name__)
+admin = Blueprint('admin', __name__)
+home = Blueprint('home', __name__)
+
 
 books = []
 book_details = {}
 
 
-class Admin(object):
+class Admin(Resource):
     """
     This class contains all the function, which the admin is able to undertake;
     include: adding book, updating details of book, and deleting an exiting book
@@ -40,7 +42,7 @@ class Admin(object):
             return jsonify({'Deleted': bookId})
 
 
-class Books(object):
+class Books(Resource):
     """
     This class contain list of all books.
     User can get all books or one book
@@ -57,7 +59,7 @@ class Books(object):
             return jsonify({book: bookId})
 
 
-class BorrowBook(object):
+class BorrowBook(Resource):
     """
     This class contains function that authenticated users can borrow books.
     """

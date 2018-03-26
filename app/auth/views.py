@@ -1,15 +1,17 @@
 # global imports
-from flask import request, jsonify
+from flask import request, jsonify, Blueprint
 from flask_login import login_user, login_required, logout_user
+from flask_restful import Resource
 
+
+auth = Blueprint('auth', __name__)
 # local imports
-from . import auth
 
 users = []  # list that all users and their details
 user_details = {}  # dict that contain key and value of each entry
 
 
-class Auth(object):
+class Auth(Resource):
 
     @auth.route('/api/v1/auth/register', methods=['POST'])
     def register(self):
@@ -71,5 +73,4 @@ class Auth(object):
                 return jsonify({'message': "Password Reset successfully."})
         # return message to show un-existing email
         return jsonify({'message': 'The email does not exist.'})
-
 

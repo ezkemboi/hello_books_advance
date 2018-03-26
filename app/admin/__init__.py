@@ -1,6 +1,10 @@
 # Initialization of admin blueprint
-from flask import Blueprint
-from . import views
+from flask import Flask
+from .views import auth, home, admin
 
-admin = Blueprint('admin', __name__)
+app = Flask(__name__)
+app.register_blueprint(auth)
+app.register_blueprint(home)
+app.register_blueprint(admin)
+
 

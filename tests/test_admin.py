@@ -3,6 +3,7 @@ import json
 
 # Local imports
 from app import create_app
+import run
 
 """
 Admin can add, update and delete a book.
@@ -21,7 +22,7 @@ class AdminTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app(config_name="testing")
         # Init the test client
-        self.client = self.app.test_client
+        self.client = run.app.test_client()
         # Json data for the predefined parameters
         self.add_book_data = {
             'book_title': 'The Wonder Boy',

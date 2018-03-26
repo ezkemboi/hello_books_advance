@@ -2,6 +2,7 @@ import unittest
 import json
 
 from app import create_app
+import run
 
 """
 Authenticated users can; register, login, logout, reset-password and borrow books
@@ -20,7 +21,7 @@ class AuthTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app(config_name="testing")
         # Initialize the test client
-        self.client = self.app.test_client
+        self.client = run.app.test_client()
         # Make a json user data for data registration
         self.user_data = {
             'email': 'test@example.com',

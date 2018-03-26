@@ -1,5 +1,7 @@
 # These are the blueprints initialization of authenticated users
-from flask import Blueprint
-from . import views
+from flask import Flask
+from .views import auth
 
-auth = Blueprint('auth', __name__)
+
+app = Flask(__name__)
+app.register_blueprint(auth)

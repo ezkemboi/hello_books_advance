@@ -2,7 +2,7 @@ import unittest
 import json
 
 from app import create_app
-from .test_admin import AdminTestCase
+import run
 
 """
 for users; can view all books, single book
@@ -20,7 +20,7 @@ class HomeTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app(config_name="testing")
         # initialize the client
-        self.client = self.app.test_client
+        self.client = run.app.test_client()
         # json data for predefined data
         self.book_data = {
             ""
