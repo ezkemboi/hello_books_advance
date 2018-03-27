@@ -4,6 +4,7 @@ import json
 from app import create_app
 import run
 
+from .base_testcase import BaseTestCase
 """
 Authenticated users can; register, login, logout, reset-password and borrow books
 normal: {email -> string, username -> string, password -> string}
@@ -14,20 +15,10 @@ unexpected: {email -> number, character, invalid email structure: username -> "t
 """
 
 
-class AuthTestCase(unittest.TestCase):
+class AuthTestCase(BaseTestCase):
     """
     Auth test cases for register, login, logout and reset-password
     """
-    def setUp(self):
-        self.app = create_app(config_name="testing")
-        # Initialize the test client
-        self.client = run.app.test_client()
-        # Make a json user data for data registration
-        self.user_data = {
-            'email': 'test@example.com',
-            'username': 'test12',
-            'password': 'password12'
-        }
 
     # register and login helpers goes here
     def register(self, email="test@example.com", username="test12", password="password12"):
