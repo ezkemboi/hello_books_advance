@@ -36,6 +36,10 @@ Install the dependencies
 
     pip install -r requirements.txt
     
+# Access App Using Heroku
+
+   https://git.heroku.com/limitless-eyrie-38300.git
+    
 # Postman Tests
        To check on other postman tests, Look in the folder Resources
        
