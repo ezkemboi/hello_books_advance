@@ -36,6 +36,10 @@ Install the dependencies
 
     pip install -r requirements.txt
     
+# Postman Tests
+
+![alt text](https://github.com/ezrqnkemboi/hello_books/blob/flask_feature/resources/login.png)
+    
 # Licence
 
     MIT LICENCE (c) 2018 Ezrqn Kemboi
