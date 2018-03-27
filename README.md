@@ -40,7 +40,7 @@ Install the dependencies
     
 # Access App Using Heroku
 
-   https://git.heroku.com/limitless-eyrie-38300.git
+   https://hello-books-library.herokuapp.com
     
 # Postman Tests
        To check on other postman tests, Look in the folder Resources
