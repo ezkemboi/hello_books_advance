@@ -36,6 +36,15 @@ Install the dependencies
 
     pip install -r requirements.txt
     
+# Postman Tests
+       To check on other postman tests, Look in the folder Resources
+       
+   # Login Functionality
+![alt text](https://github.com/ezrqnkemboi/hello_books/blob/flask_feature/resources/login.png)
+
+   # Add Book Functionality
+![alt text](https://github.com/ezrqnkemboi/hello_books/blob/flask_feature/resources/add_book.png)
+    
 # Licence
 
     MIT LICENCE (c) 2018 Ezrqn Kemboi
