@@ -32,9 +32,9 @@ class UserRegistration(Resource):
 
         if email is not None and username is not None and password is not None:
             if len(username) <= 4:
-                return jsonify({"Message": "Length of username should be more than 4"})
+                return jsonify({"Message": "Length of username should be more than 4"}), 400
             elif len(password) < 8:
-                return jsonify({"Message": "Minimum len of password is 8"})
+                return jsonify({"Message": "Minimum len of password is 8"}), 400
 
             else:
                 user_details['email'] = email
@@ -59,8 +59,8 @@ class UserLogin(Resource):
                 # Call functionality to login the specified user in users list
                 session['logged_in'] = True
                 return jsonify({'message': "Successfully logged in."}), 202
-            return jsonify({'message': "Wrong Password"}), 401
-        return jsonify({'message': "Invalid email"}), 401
+            return jsonify({"message": "Wrong Password"}), 401
+        return jsonify({"message": "Invalid email"}), 401
 
 
 class UserLogout(Resource):
@@ -68,7 +68,7 @@ class UserLogout(Resource):
     def post(self):
         # with help of flask_login module, call logout function
         session['logged_in'] = False
-        return jsonify({'message': "You have successfully logged out."}), 202
+        return jsonify({"message": "You have successfully logged out."}), 202
 
 
 class ResetPassword(Resource):
@@ -82,14 +82,14 @@ class ResetPassword(Resource):
             if email == user['email']:
                 password = request.json.get('password')
                 if len(password) < 8:
-                    return jsonify({'message': "Password should be greater than 8"}), 400
+                    return jsonify({"message": "Password should be greater than 8"}), 400
                 else:
                     user['email'] = email
                     user['password'] = password
                     users.append(user_details)
-                    return jsonify({'message': "Password Reset successfully."}), 201
+                    return jsonify({"message": "Password Reset successfully."}), 201
             # return message to show un-existing email
-        return jsonify({'message': 'The email does not exist.'}), 404
+        return jsonify({"message": "The email does not exist."}), 404
 
 
 class Book(Resource):
@@ -117,7 +117,7 @@ class Book(Resource):
             book_details['isnb'] = isnb
             books.append(book_details)
             return jsonify({"message": "Added the book Successfully."}), 201
-        return jsonify({'message': "Fill all the details correctly."}), 400
+        return jsonify({"message": "Fill all the details correctly."}), 400
 
     # method to get all books
     @home.route
@@ -125,7 +125,7 @@ class Book(Resource):
         if len(books) >= 1:
             return jsonify(books), 200
         else:
-            return jsonify({'message': "There is no books found"}), 404
+            return jsonify({"message": "There is no books found"}), 404
 
 
 class SingleBook(Resource):
@@ -151,7 +151,7 @@ class SingleBook(Resource):
                 book['year'] = year
                 book['isnb'] = isnb
                 books[book_index] = book
-                return jsonify({"Success": "Book Updated.", "Books": books}), 201
+                return jsonify({"Success": "Book Updated."}), 201
             book_index += 1
         return jsonify({"message": "The book is not found."}), 404
 
@@ -183,7 +183,7 @@ class Users(Resource):
             if book_id == book['book_id']:
                 books.remove(book)
                 borrowed_books.append(book)
-                return jsonify({'message': "successfully borrowed a book"}), 202
+                return jsonify({"message": "successfully borrowed a book"}), 202
 
         return jsonify({"Error": "Book not found."}), 404
 
