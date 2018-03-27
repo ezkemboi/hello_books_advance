@@ -1,0 +1,309 @@
+FORMAT: 1A
+HOST: https://hello-books-library.herokuapp.com
+
+# hellobooks
+
+Hello-Books is a simple application that helps manage a library and its processes like stocking, tracking and renting books. 
+
+## User Registration [/api/v1/auth/register]
+    
+### Create a user account [POST]
+
+You can create a user account with a Json request of email, username and password. 
+The username lenght should be greater than 4.
+The length minimum lenght of password is 8.
+
++ Request (application/json)
+
+        {
+            "email": "johndoe@gmail.com",
+            "username": "johndoe",
+            "password": "johndoe123"
+        }
+
++ Response 201 (application/json)
+
+    + Body
+
+            {
+                "Message": "The User is successfully Registered."
+            }
+
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "Message": "Email, Username and Password is required."
+            }
+
+
+## User Login [/api/v1/auth/login]
+
+### Login user [POST]
+
+You can login user by sending an email and password.
+
++ Request (application/json)
+
+        {
+            "email": "johndoe@gmail.com",
+            "password": "johndoe123"
+        }
+
++ Response 202 (application/json)
+
+    + Body
+
+            {
+                "message": "Successfully logged in."
+            }
+
++ Response 401 (application/json)
+
+    + Body
+
+            {
+                "message": "Invalid email"
+            }
+            
+## User Logout [/api/v1/auth/logout]
+
+### Logout a user [POST]
+
+You can logout a user in session by making the session to False.
+
++ Request (application/json)
+
+    + Headers
+    
+            session: False
+
++ Response 202 (application/json)
+
+    + Body
+
+            {
+                "message": "You have successfully logged out."
+            }
+
+## Reset Password [/api/v1/auth/reset-password]
+
+### Reset User Password [POST]
+
+You may reset password by providing a registered email. 
+
++ Request (application/json)
+
+        {
+            "email": "johndoe@gmail.com",
+            "password": "newjohndoe123"
+        }
+
++ Response 201 (application/json)
+
+    + Body
+
+            {
+                "message": "Password Reset successfully."
+            }
+            
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "message": "Password should be greater than 8"
+            }
+            
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "message": "The email does not exist."
+            }
+
+## Books Resources [/api/v1/books]
+
+### Retrieve all books [GET]
+You can get all books available in the library store.
+
++ Response 200 (application/json)
+
+        [
+            {"book_id": "1",
+            "book_title": "The mask Head",
+            "authors": "John Doe",
+            "publisher": "Longhorn",
+            "year": "2012",
+            "isnb": "1234523867"},
+            {"book_id": "2",
+            "book_title": "The Header",
+            "authors": "Jack Malo",
+            "publisher": "Longhorn",
+            "year": "2012",
+            "isnb": "1234523867"},
+            
+        ]
+        
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "message": "There is no books found"
+            }
+
+### Add book [POST]
+
+You can add a book when you are an admin.
+
++ Request (application/json)
+
+        {
+            "book_title": "The mask Head",
+            "authors": "John Doe",
+            "publisher": "Longhorn",
+            "year": "2012",
+            "isnb": "1234523867"
+        }
+
++ Response 201 (application/json)
+
+    + Body
+
+            {
+                "message": "Added the book Successfully."
+            }
+            
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "message": "Fill all the details correctly."
+            }
+            
+## Single Book Resources [/api/v1/books/<int:book_id>]
+
+### Retrieve one book [GET]
+You can get one book from the library store.
+            
++ Response 200 (application/json)
+
+        [
+            {
+            "book_id": "1",
+            "book_title": "The mask Head",
+            "authors": "John Doe",
+            "publisher": "Longhorn",
+            "year": "2012",
+            "isnb": "1234523867"
+            }
+        ]
+        
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "Error": "Book not found."
+            }
+
+### Delete book [DELETE]
+
+You can delete a single book as an admin.
+
++ Request (application/json)
+
+        {
+            "question": "Favourite programming language?",
+            "choices": [
+                "Swift",
+                "Python",
+                "Objective-C",
+                "Ruby"
+            ]
+        }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "status": "success", 
+                "message": "book deleted successfully"
+            }
+            
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "error": "book not found"
+            }
+
+### Edit book [PUT]
+
+You can edit single book as an admin.
+
++ Request (application/json)
+
+        {
+            "book_title": "The Head Mask",
+            "authors": "Jack John",
+            "publisher": "Longhorn",
+            "year": "2011",
+            "isnb": "1234545867"
+        }
+
++ Response 201 (application/json)
+
+    + Body
+
+            {
+                "Success": "Book Updated."
+            }
+            
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "message": "The book is not found."
+            }
+
+## Borrow a Book [/api/users/books/<int:book_id>]
+    
+### Borrow a book [POST]
+
+You can borrow a book available in the library.
+
++ Request (application/json)
+
+        {
+            "question": "Favourite programming language?",
+            "choices": [
+                "Swift",
+                "Python",
+                "Objective-C",
+                "Ruby"
+            ]
+        }
+
++ Response 202 (application/json)
+
+    + Body
+
+            {
+                "message": "successfully borrowed a book"
+            }
+            
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "Error": "Book not found."
+            }
