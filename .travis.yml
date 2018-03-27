@@ -27,6 +27,11 @@ env:
 # command to run tests
 script: true
   - nosetests -v ./tests --with-coverage --cover-package=./app
+  - nosetests --rednose tests/test_admin.py tests/test_auth.py tests/test_home.py --nocapture --with-coverage
   
 after_script:
   - coveralls
+  - codeclimate-test-reporter --file .coverage
+
+
+  
