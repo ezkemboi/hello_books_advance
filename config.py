@@ -1,6 +1,3 @@
-import os
-
-
 class Config(object):
     """
     All common configurations for app goes here.

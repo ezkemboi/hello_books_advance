@@ -2,8 +2,7 @@ import unittest
 
 # Local imports
 from app.app import app
-from app.endpoints import api
-from app.models import User, Book
+from app.models import User
 
 
 class BaseTestCase(unittest.TestCase):

@@ -22,7 +22,7 @@ user_details = {}  # dict that contain key and value of each entry
 
 
 class UserRegistration(Resource):
-
+    @auth.route
     def post(self):
         email = request.json.get('email')
 
@@ -46,7 +46,7 @@ class UserRegistration(Resource):
 
 
 class UserLogin(Resource):
-
+    @auth.route
     def post(self):
 
         email = request.json.get('email')
@@ -64,7 +64,7 @@ class UserLogin(Resource):
 
 
 class UserLogout(Resource):
-
+    @auth.route
     def post(self):
         # with help of flask_login module, call logout function
         session['logged_in'] = False
@@ -72,7 +72,7 @@ class UserLogout(Resource):
 
 
 class ResetPassword(Resource):
-
+    @auth.route
     def post(self):
         # Fill the email
         email = request.json.get('email')
@@ -98,6 +98,7 @@ class Book(Resource):
     """
 
     # Method to add a book
+    @admin.route
     def post(self):
 
         book_title = request.json.get('book_title')
@@ -119,6 +120,7 @@ class Book(Resource):
         return jsonify({'message': "Fill all the details correctly."})
 
     # method to get all books
+    @home.route
     def get(self):
         return jsonify(books)
 
@@ -130,6 +132,7 @@ class SingleBook(Resource):
     """
 
     # method to update book details
+    @admin.route
     def put(self, book_id):
         book_index = 0
         book_title = request.json.get('book_title')
@@ -150,6 +153,7 @@ class SingleBook(Resource):
         return jsonify({"message": "The book is not found."})
 
     # Removes a book
+    @admin.route
     def delete(self, book_id):
         for book in books:
             if book_id == book['book_id']:
@@ -158,6 +162,7 @@ class SingleBook(Resource):
         return jsonify({"error": "book not found"})
 
     # method to get a single book
+    @home.route
     def get(self, book_id):
         for book in books:
             if book_id == book['book_id']:
@@ -168,6 +173,7 @@ class SingleBook(Resource):
 class Users(Resource):
 
     # method to allow users borrow a book.
+    @auth.route
     def post(self, book_id):
 
         for book in books:
