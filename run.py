@@ -1,11 +1,5 @@
-# global imports
-import os
-
-# Local imports
-from app import create_app
-
-config_name = os.getenv('APP_SETTINGS')
-app = create_app(config_name)
+from app.app import app
+from app.endpoints import api
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
