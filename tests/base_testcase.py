@@ -18,7 +18,5 @@ class BaseTestCase(unittest.TestCase):
         with self.app.app_context():
             user = User(email="test@example.com", username="test12", password="mypassword")
 
-
-
 if __name__ == '__main__':
     unittest.main()
