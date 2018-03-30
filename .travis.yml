@@ -11,11 +11,6 @@ before_script:
   
 install:
   - pip install -r requirements.txt
-  - pip install coverage
-  - pip install python-coveralls
-  - pip install coverage
-  - pip install nose  
-  - pip install codeclimate-test-reporter
 
 # for codecoverage on codeclimate.com
 env:
@@ -26,12 +21,9 @@ env:
 
 # command to run tests
 script: true
-  - nosetests -v ./tests --with-coverage --cover-package=./app
-  - nosetests --rednose tests/test_admin.py tests/test_auth.py tests/test_home.py --nocapture --with-coverage
+  - nosetests --with-coverage --cover-package=app
   
 after_script:
   - coveralls
   - codeclimate-test-reporter --file .coverage
-
-
   

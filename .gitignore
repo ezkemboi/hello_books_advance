@@ -99,3 +99,10 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# ignore pycharm files
+/.idea/
+
+# ignore virtual env
+Pipfile
+pipfile.lock
