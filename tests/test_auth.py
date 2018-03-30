@@ -22,71 +22,80 @@ class AuthTestCase(unittest.TestCase):
     def setUp(self):
         self.app = app
         self.client = run.app.test_client()
-        self.user = {
+        self.already_registered = {
+            'email': "registered@example.com",
+            'username': "registered",
+            'password': "registeredpassword"
+        }
+        self.registered_data = {
+            'email': "registered@example.com",
+            'username': "registered",
+            'password': "registeredpassword"
+        }
+        self.user_data = {
             'email': "myemail@gmail.com",
             'username': "testuser",
             'password': "passwordtrade"
+        }
+        self.login_data = {
+            'email': "registered@example.com",
+            'password': "registeredpassword"
         }
         self.not_user = {
             'email': 'not_user@example.com',
             'password': 'nope'
         }
 
-    # register and login helpers to help logout user
-    def register(self):
-        user_data = {
-            'email': "test@example.com",
-            'username': "test12",
-            'password': "password12"
-        }
-        return self.client.post('/api/v1/auth/register', data=user_data)
+    # register helpers here
+    def register(self, user_data):
+        register_user = self.client.post('/api/v1/auth/register', data=user_data)
+        return register_user
 
-    def login(self):
-        user_data = {
-            'email': "test@example.com",
-            'password': "password12"
-        }
-        return self.client.post('/api/v1/auth/register', data=user_data)
+    # login helpers here
+    def login(self, login_data):
+        login = self.client.post('/api/v1/auth/register', data=login_data)
+        return login
 
     def test_registration(self):
         """
         Test user registration
         :return: registration
         """
-        res = self.client.post('/register', data=json.dumps(self.user), content_type='application/json')
-        # assert that request contains a success message, 201 code
-        self.assertIn("You are registered successfully.", str(res.data))
-        self.assertEqual(res.status_code, 201)
+        register_user = self.client.post('/api/v1/auth/register', data=json.dumps(self.user_data),
+                                         content_type='application/json')
+        self.assertEqual(register_user.status_code, 201)
+        result = json.loads(register_user.data.decode())
+        self.assertEqual(result['Message'], 'The User is successfully Registered.')
 
     def test_already_registered(self):
         """
         This test code helps to eliminate double registration
         :return: error message
         """
-        res = self.client.post('/register', data=json.dumps(self.user), content_type='application/json')
+        res = self.client.post('/api/v1/auth/register', data=json.dumps(self.registered_data),
+                               content_type='application/json')
         self.assertEqual(res.status_code, 201)
-        second_res = self.client.post('/api/v1/auth/register', str(res.data))
-        self.assertEqual(second_res.status_code, 202)
+        second_res = self.client.post('/api/v1/auth/register', data=json.dumps(self.already_registered),
+                                      content_type='application/json')
         result = json.loads(second_res.data.decode())
-        self.assertEqual(result['message'], "Such a user already exist.")
+        self.assertEqual(second_res.status_code, 202)
+        self.assertEqual(result['Message'], 'The user is already registered.')
 
     def test_login_for_registered_user(self):
         """
         Test the login for user already registered.
         :return: login successful
         """
-        res = self.client.post('/api/v1/auth/register', data=json.dumps(self.user), content_type='application/json')
-        # return the code success for registration
-        self.assertEqual(res.status_code, 201)
-        # define login res
-        login_res = self.client.post('/api/v1/auth/login', data=self.user)
 
+        # define login res
+        login_res = self.client.post('/api/v1/auth/login', data=json.dumps(self.login_data),
+                                     content_type='application/json')
         # decode the json data
         result = json.loads(login_res.data.decode())
-        # returning the success message and code
-        self.assertEqual(result['message'], "Successfully logged in")
         # return the result status code
         self.assertEqual(login_res.status_code, 200)
+        # returning the success message and code
+        self.assertEqual(result['message'], "Successfully logged in.")
 
     def test_login_for_non_user(self):
         """
@@ -99,10 +108,10 @@ class AuthTestCase(unittest.TestCase):
         result = json.loads(res.data.decode())
         # assert the response and return error status code 401
         self.assertEqual(res.status_code, 401)
-        self.assertEqual(result['message'], "Invalid email or password, Please try again")
+        self.assertEqual(result["message"], "Wrong email or Password")
 
     def test_reset_password(self):
-        res = self.client.post('/api/v1/auth/reset-password', data=json.dumps(self.user),
+        res = self.client.post('/api/v1/auth/reset-password', data=json.dumps(self.user_data),
                                content_type='application/json')
         # receive data in json format
         result = json.loads(res.data.decode())
@@ -110,14 +119,14 @@ class AuthTestCase(unittest.TestCase):
         self.assertEqual(result['message'], "Reset Password Successful.")
 
     def test_logout(self):
-        # call function for register
-        self.register()
-        # call function to login the user
-        self.login()
-        # Logout the user now
-        res = self.client.post('/api/v1/auth/logout')
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual('Message', "Your logged out.")
+        login_res = self.client.post('/api/v1/auth/login', data=json.dumps(self.login_data),
+                                     content_type='application/json')
+        self.assertEqual(login_res.status_code, 200)
+
+        logout_user = self.client.post('/api/v1/auth/logout', data=json.dumps(self.login_data),
+                                       content_type='application/json')
+        # result = json.loads(logout_user.data)
+        self.assertEqual(logout_user.status_code, 200)
 
 
 if __name__ == '__main__':

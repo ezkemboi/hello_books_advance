@@ -2,19 +2,16 @@
 from flask import Flask, session
 from flask import request
 from flask_restful import Resource, Api
+import random
 
+# Local imports
+from app.models import User, Book
 
 app = Flask(__name__)
 api = Api(app)
 app.secret_key = 'mysecretkeyishere'
 
-
-books = []
 borrowed_books = []
-
-
-users = []  # list that all users and their details
-user_details = {}  # dict that contain key and value of each entry
 
 
 class UserRegistration(Resource):
@@ -25,19 +22,17 @@ class UserRegistration(Resource):
 
         password = request.json.get('password')
 
-        if email is not None and username is not None and password is not None:
-            if len(username) <= 4:
-                return {"Message": "Length of username should be more than 4"}, 400
-            elif len(password) < 8:
-                return {"Message": "Minimum len of password is 8"}, 400
+        user = User.get_user_by_email(email)
 
-            else:
-                user_details['email'] = email
-                user_details['username'] = username
-                user_details['password'] = password
-                users.append(user_details)
+        if not user:
+            if len(username) >= 4 and len(password) > 8:
+                create_user = User()
+                create_user.email = email
+                create_user.password = password
+                create_user.save_user()
                 return {"Message": "The User is successfully Registered."}, 201
-        return {"Message": "Email, Username and Password is required."}, 400
+        else:
+            return {"Message": "The user is already registered."}, 202
 
 
 class UserLogin(Resource):
@@ -46,22 +41,21 @@ class UserLogin(Resource):
         email = request.json.get('email')
         password = request.json.get('password')
 
-        if email is None and password is None:
-            return {'message': "Please enter email and password."}, 400
-        elif email == user_details['email']:
-            if password == user_details['password']:
-                # Call functionality to login the specified user in users list
-                session['logged_in'] = True
-                return {'message': "Successfully logged in."}, 202
-            return {"message": "Wrong Password"}, 401
-        return {"message": "Invalid email"}, 401
+        log_in_user = User.get_user_by_email(email)
+
+        if log_in_user and password == log_in_user.password:
+            # Call functionality to login the specified user in users list
+            session['logged_in'] = True
+            return {'message': "Successfully logged in."}, 200
+        else:
+            return {"message": "Wrong email or Password"}, 401
 
 
 class UserLogout(Resource):
     def post(self):
         # with help of flask_login module, call logout function
         session['logged_in'] = False
-        return {"message": "You have successfully logged out."}, 202
+        return {"Message": "Your logged out."}, 200
 
 
 class ResetPassword(Resource):
@@ -70,21 +64,23 @@ class ResetPassword(Resource):
         email = request.json.get('email')
 
         # check if the email exist
-        for user in users:
-            if email == user['email']:
-                password = request.json.get('password')
-                if len(password) < 8:
-                    return {"message": "Password should be greater than 8"}, 400
-                else:
-                    user['email'] = email
-                    user['password'] = password
-                    users.append(user_details)
-                    return {"message": "Password Reset successfully."}, 201
-            # return message to show un-existing email
+        reset_user = User.get_user_by_email(email)
+
+        if reset_user:
+            password = request.json.get('password')
+            if len(password) < 8:
+                return {"message": "Password should be greater than 8"}, 400
+            else:
+                update_email = User()
+                update_email.email = email
+                update_email.password = password
+                update_email.save_user()
+                return {"message": "Reset Password Successful."}, 200
+        # return message to show un-existing email
         return {"message": "The email does not exist."}, 404
 
 
-class Book(Resource):
+class AddBook(Resource):
     """
     Contains all the methods to add book, list all books
     """
@@ -92,28 +88,33 @@ class Book(Resource):
     # Method to add a book
     def post(self):
 
+        book_id = random.randint(1111, 9999)  # Generate four random numbers for book_id
         book_title = request.json.get('book_title')
         authors = request.json.get('authors')
         publisher = request.json.get('publisher')
         year = request.json.get('year')
         isnb = request.json.get('isnb')
-        if book_title is not None and authors is not None and publisher is not None and year is not None and \
-                        isnb is not None:
-            book_details = {}
-            book_details['book_id'] = len(books) + 1
-            book_details['book_title'] = book_title
-            book_details['authors'] = authors
-            book_details['publisher'] = publisher
-            book_details['year'] = year
-            book_details['isnb'] = isnb
-            books.append(book_details)
+
+        existing_id = Book.get_book_by_id(book_id)
+        existing_book = Book.get_book_by_isnb(isnb)
+
+        if not existing_book and not existing_id:
+            new_book = Book()
+            new_book.book_id = book_id
+            new_book.book_title = book_title
+            new_book.authors = authors
+            new_book.publisher = publisher
+            new_book.year = year
+            new_book.isnb = isnb
+            new_book.save_book()
             return {"message": "Added the book Successfully."}, 201
         return {"message": "Fill all the details correctly."}, 400
 
     # method to get all books
     def get(self):
-        if len(books) >= 1:
-            return (books), 200
+        available_books = Book.get_all_books()
+        if len(available_books) >= 1:
+            return {available_books}, 200
         else:
             return {"message": "There is no books found"}, 404
 
@@ -126,33 +127,44 @@ class SingleBook(Resource):
 
     # method to update book details
     # @admin.route
-    def put(self, book_id):
-        book_index = 0
+    def put(self, book_id, isnb):
+
+        # Get books by isnb and book_id
+        get_book = Book.get_book_by_id(book_id)
+        get_isnb = Book.get_book_by_isnb(isnb)
+
+        # Fetch data
+        book_id = get_book  # Book Id is not editable
         book_title = request.json.get('book_title')
         authors = request.json.get('authors')
         publisher = request.json.get('publisher')
         year = request.json.get('year')
-        isnb = request.json.get('isnb')
-        for book in books:
-            if book_id == book['book_id']:
-                book['book_title'] = book_title
-                book['authors'] = authors
-                book['publisher'] = publisher
-                book['year'] = year
-                book['isnb'] = isnb
-                books[book_index] = book
-                return {"Success": "Book Updated."}, 201
-            book_index += 1
-        return {"message": "The book is not found."}, 404
+        isnb = get_isnb  # ISNB of a book cannot be edited.
+
+        if get_book:
+            edited_book = Book()
+            edited_book.book_id = book_id
+            edited_book.book_title = book_title
+            edited_book.authors = authors
+            edited_book.publisher = publisher
+            edited_book.year = year
+            edited_book.isnb = isnb
+            edited_book.save_book()
+            return {"success": "Book Updated."}, 200
+        else:
+            return {"message": "The book is not found."}, 404
 
     # Removes a book
     # @admin.route
     def delete(self, book_id):
-        for book in books:
-            if book_id == book['book_id']:
-                books.remove(book)
-                return {"status": "success", "message": "book deleted successfully"}, 200
-        return {"error": "book not found"}, 404
+        get_book_id = Book.get_book_by_id(book_id)
+
+        if get_book_id:
+            get_book_id.delete()
+            return {"message": "Book deleted successfully."}, 200
+        # else:
+        #     print("hi")
+        #     # return {"error": "Book not found."}, 204
 
     # method to get a single book
     def get(self, book_id):
@@ -180,7 +192,7 @@ api.add_resource(UserLogin, '/api/v1/auth/login')
 api.add_resource(UserLogout, '/api/v1/auth/logout')
 api.add_resource(ResetPassword, '/api/v1/auth/reset-password')
 
-api.add_resource(Book, '/api/v1/books')
+api.add_resource(AddBook, '/api/v1/books')
 api.add_resource(SingleBook, '/api/v1/books/<int:book_id>')
 api.add_resource(Users, '/api/v1/users/books/<book_id>')
 

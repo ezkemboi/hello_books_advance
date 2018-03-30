@@ -29,22 +29,21 @@ Hello-Books is a simple application that helps manage a library and its processe
     Only Authenticated Users can borrow and return books.
     Only admin users should be able to add, modify and delete book information 
     Users can view their profile and their borrowing history
-# Installation Process
- # Use cmd or terminal to install and run the app
+# Installation Process and Running App
  
-   $ git clone https://github.com/ezrqnkemboi/hello_books.git
-    
-   $ pip install --user pipenv
-   
-   $ cd hello_books
-   
-   $ pipenv install requests
-   
-   $ pip install -r requirements.txt
-   
-   $ pipenv shell
-   
-   $ python run.py
+  clone: $ git clone https://github.com/ezrqnkemboi/hello_books.git
+        
+  Install virtual env: $ pip install --user pipenv
+       
+  Go to project directory: $ cd hello_books
+       
+  Install env requests: $ pipenv install requests
+       
+  Install dependencies: $ pip install -r requirements.txt
+       
+  Activate virtual env: $ pipenv shell
+       
+  Run app: $ python run.py
     
     
 # Credits
