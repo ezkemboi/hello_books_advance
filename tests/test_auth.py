@@ -1,10 +1,10 @@
 import unittest
 import json
+from app import app
 
-from app import create_app
+
 import run
 
-from .base_testcase import BaseTestCase
 """
 Authenticated users can; register, login, logout, reset-password and borrow books
 normal: {email -> string, username -> string, password -> string}
@@ -15,37 +15,47 @@ unexpected: {email -> number, character, invalid email structure: username -> "t
 """
 
 
-class AuthTestCase(BaseTestCase):
+class AuthTestCase(unittest.TestCase):
     """
     Auth test cases for register, login, logout and reset-password
     """
-
-    # register and login helpers goes here
-    def register(self, email="test@example.com", username="test12", password="password12"):
-        user_data = {
-            'email': email,
-            'username': username,
-            'password': password
+    def setUp(self):
+        self.app = app
+        self.client = run.app.test_client()
+        self.user = {
+            'email': "myemail@gmail.com",
+            'username': "testuser",
+            'password': "passwordtrade"
         }
-        return self.client().post('/api/v1/auth/register', data=user_data)
-
-    def login(self, email="test@example.com", password="password12"):
-        user_data = {
-            'email': email,
-            'password': password
+        self.not_user = {
+            'email': 'not_user@example.com',
+            'password': 'nope'
         }
-        return self.client().post('/api/v1/auth/register', data=user_data)
+
+    # register and login helpers to help logout user
+    def register(self):
+        user_data = {
+            'email': "test@example.com",
+            'username': "test12",
+            'password': "password12"
+        }
+        return self.client.post('/api/v1/auth/register', data=user_data)
+
+    def login(self):
+        user_data = {
+            'email': "test@example.com",
+            'password': "password12"
+        }
+        return self.client.post('/api/v1/auth/register', data=user_data)
 
     def test_registration(self):
         """
         Test user registration
         :return: registration
         """
-        res = self.client().post('/api/v1/auth/register', data=self.user_data)
-        # get the results returned in json format
-        result = json.loads(res.data.decode())
+        res = self.client.post('/register', data=json.dumps(self.user), content_type='application/json')
         # assert that request contains a success message, 201 code
-        self.assertEqual(result['message'], "You are registered successfully.")
+        self.assertIn("You are registered successfully.", str(res.data))
         self.assertEqual(res.status_code, 201)
 
     def test_already_registered(self):
@@ -53,9 +63,9 @@ class AuthTestCase(BaseTestCase):
         This test code helps to eliminate double registration
         :return: error message
         """
-        res = self.client().post('/api/v1/auth/register', data=self.user_data)
+        res = self.client.post('/register', data=json.dumps(self.user), content_type='application/json')
         self.assertEqual(res.status_code, 201)
-        second_res = self.client().post('/api/v1/auth/register', data=self.user_data)
+        second_res = self.client.post('/api/v1/auth/register', str(res.data))
         self.assertEqual(second_res.status_code, 202)
         result = json.loads(second_res.data.decode())
         self.assertEqual(result['message'], "Such a user already exist.")
@@ -65,11 +75,11 @@ class AuthTestCase(BaseTestCase):
         Test the login for user already registered.
         :return: login successful
         """
-        res = self.client().post('/api/v1/auth/register', data=self.user_data)
+        res = self.client.post('/api/v1/auth/register', data=json.dumps(self.user), content_type='application/json')
         # return the code success for registration
         self.assertEqual(res.status_code, 201)
         # define login res
-        login_res = self.client().post('/api/v1/auth/login', data=self.user_data)
+        login_res = self.client.post('/api/v1/auth/login', data=self.user)
 
         # decode the json data
         result = json.loads(login_res.data.decode())
@@ -83,12 +93,8 @@ class AuthTestCase(BaseTestCase):
         Test non registered users cannot login
         :return: error msg 401 (unauthorized)
         """
-        not_user = {
-            'email': 'not_user@example.com',
-            'password': 'nope'
-        }
         # make a post request from login
-        res = self.client().post('/api/v1/auth/login', data=not_user)
+        res = self.client.post('/api/v1/auth/login', data=json.dumps(self.not_user), content_type='application/json')
         # receive the result in json
         result = json.loads(res.data.decode())
         # assert the response and return error status code 401
@@ -96,11 +102,8 @@ class AuthTestCase(BaseTestCase):
         self.assertEqual(result['message'], "Invalid email or password, Please try again")
 
     def test_reset_password(self):
-        user_data = {
-            "email": "test@example.com",
-            "password": "password12"
-        }
-        res = self.client().post('/api/v1/auth/reset-password', data=user_data)
+        res = self.client.post('/api/v1/auth/reset-password', data=json.dumps(self.user),
+                               content_type='application/json')
         # receive data in json format
         result = json.loads(res.data.decode())
         self.assertEqual(res.status_code, 200)
@@ -112,12 +115,9 @@ class AuthTestCase(BaseTestCase):
         # call function to login the user
         self.login()
         # Logout the user now
-        res = self.client().post('/api/v1/auth/logout')
+        res = self.client.post('/api/v1/auth/logout')
         self.assertEqual(res.status_code, 200)
         self.assertEqual('Message', "Your logged out.")
-
-    def test_user_borrow_book(self):
-        res = self.client().post('/api/v1/users/books/')
 
 
 if __name__ == '__main__':
