@@ -3,6 +3,7 @@ from flask import Flask, session
 from flask import request
 from flask_restful import Resource, Api
 import random
+import re
 
 # Local imports
 from app.models import User, Book
@@ -25,12 +26,20 @@ class UserRegistration(Resource):
         user = User.get_user_by_email(email)
 
         if not user:
-            if len(username) >= 4 and len(password) > 8:
+            # Use re to check valid email input.
+            if not re.match("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email.strip()):
+                return {"Message": "Please provide a valid email."}
+
+            # username and password contains numbers, special char or alpha. Min of 4 and 8 respectively.
+            elif re.match("[A-Za-z0-9@#$%^&+=]{4,}", username.strip()) and \
+                    re.match(r'[A-Za-z0-9@#$%^&+=]{8,}', password.strip()):
                 create_user = User()
                 create_user.email = email
                 create_user.password = password
                 create_user.save_user()
                 return {"Message": "The User is successfully Registered."}, 201
+            else:
+                return {"Message": "Username and password should be min of 4 and 8 respectively."}
         else:
             return {"Message": "The user is already registered."}, 202
 
@@ -46,9 +55,9 @@ class UserLogin(Resource):
         if log_in_user and password == log_in_user.password:
             # Call functionality to login the specified user in users list
             session['logged_in'] = True
-            return {'message': "Successfully logged in."}, 200
+            return {'Message': "Successfully logged in."}, 200
         else:
-            return {"message": "Wrong email or Password"}, 401
+            return {"Message": "Wrong email or Password"}, 401
 
 
 class UserLogout(Resource):
@@ -68,16 +77,16 @@ class ResetPassword(Resource):
 
         if reset_user:
             password = request.json.get('password')
-            if len(password) < 8:
-                return {"message": "Password should be greater than 8"}, 400
-            else:
+            if re.match(r'[A-Za-z0-9@#$%^&+=]{8,}', password.strip()):
                 update_email = User()
                 update_email.email = email
                 update_email.password = password
                 update_email.save_user()
-                return {"message": "Reset Password Successful."}, 200
+                return {"Message": "Reset Password Successful."}, 200
+            else:
+                return {"Message": "Password should be greater than 8"}, 400
         # return message to show un-existing email
-        return {"message": "The email does not exist."}, 404
+        return {"Message": "The email does not exist."}, 404
 
 
 class AddBook(Resource):
@@ -98,6 +107,10 @@ class AddBook(Resource):
         existing_id = Book.get_book_by_id(book_id)
         existing_book = Book.get_book_by_isnb(isnb)
 
+        user_logged = User.logged_in()
+
+        # if user_logged:
+
         if not existing_book and not existing_id:
             new_book = Book()
             new_book.book_id = book_id
@@ -107,8 +120,10 @@ class AddBook(Resource):
             new_book.year = year
             new_book.isnb = isnb
             new_book.save_book()
-            return {"message": "Added the book Successfully."}, 201
-        return {"message": "Fill all the details correctly."}, 400
+            return {"Message": "Added the book Successfully."}, 201
+        return {"Message": "Fill all the details correctly."}, 400
+        # else:
+        #     return {"Message": "Login to add a book."}
 
     # method to get all books
     def get(self):
@@ -116,7 +131,7 @@ class AddBook(Resource):
         if len(available_books) >= 1:
             return {available_books}, 200
         else:
-            return {"message": "There is no books found"}, 404
+            return {"Message": "There is no books found"}, 404
 
 
 class SingleBook(Resource):
@@ -150,9 +165,9 @@ class SingleBook(Resource):
             edited_book.year = year
             edited_book.isnb = isnb
             edited_book.save_book()
-            return {"success": "Book Updated."}, 200
+            return {"Success": "Book Updated."}, 200
         else:
-            return {"message": "The book is not found."}, 404
+            return {"Message": "The book is not found."}, 404
 
     # Removes a book
     # @admin.route
@@ -161,7 +176,7 @@ class SingleBook(Resource):
 
         if get_book_id:
             get_book_id.delete()
-            return {"message": "Book deleted successfully."}, 200
+            return {"Message": "Book deleted successfully."}, 200
         # else:
         #     print("hi")
         #     # return {"error": "Book not found."}, 204
@@ -183,7 +198,7 @@ class Users(Resource):
             if book_id == book['book_id']:
                 books.remove(book)
                 borrowed_books.append(book)
-                return {"message": "successfully borrowed a book"}, 202
+                return {"Message": "successfully borrowed a book"}, 202
 
         return {"Error": "Book not found."}, 404
 
