@@ -120,10 +120,13 @@ class AddBook(Resource):
     # method to get all books
     def get(self):
         available_books = Book.get_all_books()
-        if len(available_books) >= 1:
-            return {available_books}, 200
+        if available_books is not None:
+            if len(available_books) >= 1:
+                return {available_books}, 200
+            else:
+                return {"Message": "There is no books found"}, 404
         else:
-            return {"Message": "There is no books found"}, 404
+            return {"Message": "Books not found."}
 
 
 class SingleBook(Resource):
