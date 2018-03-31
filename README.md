@@ -7,7 +7,7 @@ Hello-Books is a simple application that helps manage a library and its processe
    http://hellobooks6.docs.apiary.io
 
 # Deployment
-   https://hello-books-library-app.herokuapp.com
+   https://shielded-peak-77124.herokuapp.com
    
 # Installing App and Run
 
