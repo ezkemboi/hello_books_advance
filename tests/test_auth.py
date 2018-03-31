@@ -95,7 +95,7 @@ class AuthTestCase(unittest.TestCase):
         # return the result status code
         self.assertEqual(login_res.status_code, 200)
         # returning the success message and code
-        self.assertEqual(result['message'], "Successfully logged in.")
+        self.assertEqual(result['Message'], "Successfully logged in.")
 
     def test_login_for_non_user(self):
         """
@@ -108,7 +108,7 @@ class AuthTestCase(unittest.TestCase):
         result = json.loads(res.data.decode())
         # assert the response and return error status code 401
         self.assertEqual(res.status_code, 401)
-        self.assertEqual(result["message"], "Wrong email or Password")
+        self.assertEqual(result["Message"], "Wrong email or Password")
 
     def test_reset_password(self):
         res = self.client.post('/api/v1/auth/reset-password', data=json.dumps(self.user_data),
@@ -116,7 +116,7 @@ class AuthTestCase(unittest.TestCase):
         # receive data in json format
         result = json.loads(res.data.decode())
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(result['message'], "Reset Password Successful.")
+        self.assertEqual(result['Message'], "Reset Password Successful.")
 
     def test_logout(self):
         login_res = self.client.post('/api/v1/auth/login', data=json.dumps(self.login_data),

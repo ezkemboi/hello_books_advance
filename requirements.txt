@@ -31,3 +31,4 @@ pycparser==2.18
 python-dateutil==2.6.1
 pytz==2017.2
 codeclimate-test-reporter
+flask_restful

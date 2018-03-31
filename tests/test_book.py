@@ -53,7 +53,7 @@ class AdminTestCase(unittest.TestCase):
         result = json.loads(add_book.data.decode())
         # make an assert of the success addition of books
         self.assertEqual(add_book.status_code, 201)
-        self.assertEqual(result['message'], 'Added the book Successfully.')
+        self.assertEqual(result['Message'], 'Added the book Successfully.')
 
     # def test_edit_book(self):
     #     """

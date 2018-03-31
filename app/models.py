@@ -1,3 +1,4 @@
+from flask import session
 
 users = []  # list that all users and their details
 books = []  # It holds a list of books
@@ -20,6 +21,14 @@ class User(object):
 
     def save_user(self):
         users.append(self)
+
+    @staticmethod
+    def logged_in():
+        session['logged_in'] = True
+
+    @staticmethod
+    def logout():
+        session['logged_in'] = False
 
 
 class Book(object):
