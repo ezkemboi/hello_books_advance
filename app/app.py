@@ -12,8 +12,6 @@ app = Flask(__name__)
 api = Api(app)
 app.secret_key = 'mysecretkeyishere'
 
-borrowed_books = []
-
 
 class UserRegistration(Resource):
     def post(self):
@@ -107,10 +105,6 @@ class AddBook(Resource):
         existing_id = Book.get_book_by_id(book_id)
         existing_book = Book.get_book_by_isnb(isnb)
 
-        user_logged = User.logged_in()
-
-        # if user_logged:
-
         if not existing_book and not existing_id:
             new_book = Book()
             new_book.book_id = book_id
@@ -122,8 +116,6 @@ class AddBook(Resource):
             new_book.save_book()
             return {"Message": "Added the book Successfully."}, 201
         return {"Message": "Fill all the details correctly."}, 400
-        # else:
-        #     return {"Message": "Login to add a book."}
 
     # method to get all books
     def get(self):
@@ -183,9 +175,9 @@ class SingleBook(Resource):
 
     # method to get a single book
     def get(self, book_id):
-        for book in books:
-            if book_id == book['book_id']:
-                return (book), 200
+        get_book = Book.get_book_by_id(book_id)
+        if get_book:
+            return {get_book}, 200
         return {"Error": "Book not found."}, 404
 
 
@@ -194,13 +186,13 @@ class Users(Resource):
     # method to allow users borrow a book.
     def post(self, book_id):
 
-        for book in books:
-            if book_id == book['book_id']:
-                books.remove(book)
-                borrowed_books.append(book)
-                return {"Message": "successfully borrowed a book"}, 202
+        get_book = Book.get_book_by_id(book_id)
+        if get_book:
+            Book.borrow_book(book_id)  # This method will append book to borrowed book and remove from available
+            return {"Message": "successfully borrowed a book"}, 202
+        else:
+            return {"Error": "Book not found."}, 404
 
-        return {"Error": "Book not found."}, 404
 
 api.add_resource(UserRegistration, '/api/v1/auth/register')
 api.add_resource(UserLogin, '/api/v1/auth/login')

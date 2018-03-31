@@ -1,7 +1,9 @@
 from flask import session
 
-users = []  # list that all users and their details
-books = []  # It holds a list of books
+users = []  # list that all users and their details.
+books = []  # It holds a list of books.
+
+books_borrowed = []  # Hold all books already borrowed.
 
 
 class User(object):
@@ -63,3 +65,9 @@ class Book(object):
     def save_book(self):
         books.append(self)
 
+    @staticmethod
+    def borrow_book(book_id):
+        for book in books:
+            if book.book_id == book_id:
+                books_borrowed.append(book)  # Save the book in borrowed book list.
+                books.remove(book)  # Remove the book from available books.
