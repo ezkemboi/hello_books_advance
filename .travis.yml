@@ -1,29 +1,9 @@
 language: python
 
+language: python
 python:
   - "3.5"
-
-
-# command to install dependencies
-before_script:
-  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - chmod +x ./cc-test-reporter
-  
-install:
-  - pip install -r requirements.txt
-
-# for codecoverage on codeclimate.com
-env:
-  global:
-    - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
-    - CODECLIMATE_REPO_TOKEN=[token]
-    - CC_TEST_REPORTER_ID=[id]
-
-# command to run tests
-script: true
-  - nosetests --with-coverage --cover-package=app
-  
-after_script:
+install: "pip install -r requirements.txt"
+script: coverage run -m unittest discover && coverage report
+after_success:
   - coveralls
-  - codeclimate-test-reporter --file .coverage
-  
