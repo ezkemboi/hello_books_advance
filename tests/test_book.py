@@ -26,10 +26,10 @@ class AdminTestCase(unittest.TestCase):
         self.add_book_data = {
             'book_id': 7898,
             'book_title': 'The Wonder Boy',
-            'authors': ['john doe', 'doe Jacob'],  # make sure authors is a list
+            'authors': 'john doe',
             'publisher': 'Longhorn Publishers',
             'year': "2006",
-            'isnb': "23-1223322-233"
+            'isnb': "231223322233"
         }
         self.modified_book = {
             'book_id': 7898,
@@ -37,10 +37,25 @@ class AdminTestCase(unittest.TestCase):
             'authors': 'Kimani John',
             'publisher': 'The Kenya Publishers',
             'year': "2015",
-            'isnb': "23-1223322-233"
+            'isnb': "231223322233"
         }
-
-    # Helpers goes here
+        self.all_books = [{
+            'book_id': 7898,
+            'book_title': 'The Wonder Boy',
+            'authors': 'john doe',
+            'publisher': 'Longhorn Publishers',
+            'year': "2006",
+            'isnb': "289939883332"
+        },
+            {
+                'book_id': 7878,
+                'book_title': 'The Wonder Joy',
+                'authors': 'Jackson',
+                'publisher': 'Longhorn Publishers',
+                'year': "2006",
+                'isnb': "23899188282"
+            }
+        ]
 
     def test_add_book(self):
         """
@@ -55,6 +70,24 @@ class AdminTestCase(unittest.TestCase):
         self.assertEqual(add_book.status_code, 201)
         self.assertEqual(result['Message'], 'Added the book Successfully.')
 
+    # def test_get_all_books(self):
+    #     """
+    #     Get all available books
+    #     :return: available books
+    #     """
+    #     add_book = self.client.post('/api/v1/books', data=json.dumps(self.add_book_data),
+    #                                 content_type='application/json')
+    #     self.assertEqual(add_book.status_code, 201)
+    #     get_books = self.client.get('/api/v1/books')
+    #     self.assertEqual(get_books.status_code, 200)
+    #
+    # def test_get_one_book(self):
+    #     add_book = self.client.post('/api/v1/books', data=json.dumps(self.add_book_data),
+    #                                 content_type='application/json')
+    #     self.assertEqual(add_book.status_code, 201)
+    #     get_book = self.client.get('/api/v1/books/7898')
+    #     self.assertEqual(get_book.status_code, 200)
+    #
     # def test_edit_book(self):
     #     """
     #     Tests for admin ability to edit book
@@ -87,25 +120,25 @@ class AdminTestCase(unittest.TestCase):
     #     :return: delete_book
     #     """
     #     # self.add_book_data['book_id'] = 7898
-        # rv = self.client.post(
-        #     '/api/v1/books',
-        #     data=json.dumps(self.add_book_data), content_type='application/json')
-        # self.assertEqual(rv.status_code, 201)
-
-        # # Try delete book
-        # res = self.client.delete(
-        #     '/api/v1/books/7898', data=json.dumps(self.add_book_data), content_type='application/json'
-        # )
-        # # result = json.loads(res.data.decode())
-        # self.assertEqual(res.status_code, 200)
-        # self.assertEqual('message', 'Book deleted successfully.')
-
-        # # # test that it has been deleted, 204 error
-        # result = self.client.get(
-        #     '/api/v1/books/7898',
-        # )
-        # self.assertEqual(result.status_code, 204)
-        # self.assertEqual("Error", "Book not found.")
+    #     rv = self.client.post(
+    #         '/api/v1/books',
+    #         data=json.dumps(self.add_book_data), content_type='application/json')
+    #     self.assertEqual(rv.status_code, 201)
+    #
+    #     # Try delete book
+    #     res = self.client.delete(
+    #         '/api/v1/books/7898', data=json.dumps(self.add_book_data), content_type='application/json'
+    #     )
+    #     # result = json.loads(res.data.decode())
+    #     self.assertEqual(res.status_code, 200)
+    #     self.assertEqual('message', 'Book deleted successfully.')
+    #
+    #     # # test that it has been deleted, 204 error
+    #     result = self.client.get(
+    #         '/api/v1/books/7898',
+    #     )
+    #     self.assertEqual(result.status_code, 204)
+    #     self.assertEqual("Error", "Book not found.")
 
 
 if __name__ == '__main__':
