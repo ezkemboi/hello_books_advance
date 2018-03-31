@@ -109,21 +109,21 @@ class AddBook(Resource):
 
         user_logged = User.logged_in()
 
-        if user_logged:
+        # if user_logged:
 
-            if not existing_book and not existing_id:
-                new_book = Book()
-                new_book.book_id = book_id
-                new_book.book_title = book_title
-                new_book.authors = authors
-                new_book.publisher = publisher
-                new_book.year = year
-                new_book.isnb = isnb
-                new_book.save_book()
-                return {"Message": "Added the book Successfully."}, 201
-            return {"Message": "Fill all the details correctly."}, 400
-        else:
-            return {"Message": "Login to add a book."}
+        if not existing_book and not existing_id:
+            new_book = Book()
+            new_book.book_id = book_id
+            new_book.book_title = book_title
+            new_book.authors = authors
+            new_book.publisher = publisher
+            new_book.year = year
+            new_book.isnb = isnb
+            new_book.save_book()
+            return {"Message": "Added the book Successfully."}, 201
+        return {"Message": "Fill all the details correctly."}, 400
+        # else:
+        #     return {"Message": "Login to add a book."}
 
     # method to get all books
     def get(self):
