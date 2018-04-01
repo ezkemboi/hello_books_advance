@@ -1,6 +1,5 @@
 # global imports
-from flask import Flask, session
-from flask import request
+from flask import Flask, session, request, render_template
 from flask_restful import Resource, Api
 import random
 import re
@@ -11,6 +10,10 @@ from app.models import User, Book
 app = Flask(__name__)
 api = Api(app)
 app.secret_key = 'mysecretkeyishere'
+
+@app.route('/')
+def index():
+    return render_template('docs.html')
 
 
 class UserRegistration(Resource):
