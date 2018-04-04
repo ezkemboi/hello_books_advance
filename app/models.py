@@ -1,9 +1,8 @@
-from flask import session
 
-users = []  # list that all users and their details.
-books = []  # It holds a list of books.
+list_of_users = []
+list_of_books = []
 
-books_borrowed = []  # Hold all books already borrowed.
+books_borrowed = []
 
 
 class User(object):
@@ -15,28 +14,28 @@ class User(object):
         self.username = None
         self.password = None
 
+    def user_serializer(self):
+        return {
+            'email': self.email,
+            'username': self.username,
+            'password': self.password
+        }
+
     @staticmethod
     def get_user_by_email(email):
-        for user in users:
+        for user in list_of_users:
             if user.email == email:
                 return user
 
     @staticmethod
     def get_user_by_username(username):
-        for user in users:
+        for user in list_of_users:
             if user.username == username:
                 return user
 
     def save_user(self):
-        users.append(self)
 
-    @staticmethod
-    def logged_in():
-        session['logged_in'] = True
-
-    @staticmethod
-    def logout():
-        session['logged_in'] = False
+        list_of_users.append(self)
 
 
 class Book(object):
@@ -50,25 +49,34 @@ class Book(object):
         self.year = None
 
     @staticmethod
+    def book_serializer(self):
+        return {
+            'book_id': self.book_id,
+            'book_title': self.book_title,
+            'authors': self.authors,
+            'year': self.year
+        }
+
+    @staticmethod
     def get_book_by_id(book_id):
-        for book in books:
+        for book in list_of_books:
             if book.book_id == book_id:
                 return book
 
     @staticmethod
     def get_all_books():
-        for book in books:
-            return book
+        return list_of_books
 
     def save_book(self):
-        books.append(self)
+        book_details = self.book_serializer(self)
+        list_of_books.append(book_details)
 
     def delete_book(self):
-        books.remove(self)
+        list_of_books.remove(self)
 
     @staticmethod
     def borrow_book(book_id):
-        for book in books:
+        for book in list_of_books:
             if book.book_id == book_id:
-                books_borrowed.append(book)  # Save the book in borrowed book list.
-                books.remove(book)  # Remove the book from available books.
+                books_borrowed.append(book)
+                list_of_books.remove(book)

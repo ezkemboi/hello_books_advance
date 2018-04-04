@@ -27,17 +27,27 @@ Hello-Books is a simple application that helps manage a library and its processe
 # Installing Application, Running and Running Tests
 
    Clone the repo
+   
    Then, install virtual environment: `pip install --user pipenv`
+   
    Cd to the directory of the application through: `cd hello_books`
+   
    Install virtual env requests: `pipenv install requests`
+   
    Install all the dependencies through: `pip install -r requirements.txt`
+   
    Activate the virtual environment: `pipenv shell`
+   
    Run application: `python run.py`
-   To run test, use: `coverage run -m unittest discover && coverage report`
+   
+# Running tests
+   
+   To run test, use: `coverage run -m unittest discover`
     
 # Deployment
-   Link: https://shielded-peak-77124.herokuapp.com
-   To create own heroku application: heroku create
+   Link: `https://shielded-peak-77124.herokuapp.com`
+   
+   To create own heroku application: `heroku create`
 
 # Contributors
    Ezrqn Kemboi

@@ -3,6 +3,10 @@ source =
     app/
     tests/
 
+omit =
+    app/__init__.py
+    tests/__init__.py
+
 [report]
 show_missing = True
 

@@ -5,21 +5,15 @@ from app import app
 
 import run
 
-"""
-Authenticated users can; register, login, logout, reset-password and borrow books
-normal: {email -> string, username -> string, password -> string}
-boundaries: {}
-edge: {}
-unexpected: {email -> number, character, invalid email structure: username -> "too long", numerical; password -> "too short",
-"too long"}
-"""
-
 
 class AuthTestCase(unittest.TestCase):
     """
     Auth test cases for register, login, logout and reset-password
     """
     def setUp(self):
+        """
+        Initialize the application for testing
+        """
         self.app = app
         self.client = run.app.test_client()
         self.already_registered = {
@@ -50,23 +44,44 @@ class AuthTestCase(unittest.TestCase):
             "username": "username",
             "password": "short"
         }
+        self.empty_login_data = {
+            'email': "",
+            'password': ""
+        }
+        self.wrong_password_data = {
+            'email': "registered@example.com",
+            'password': "wrongpassword"
+        }
+        self.empty_register_data = {
+            'email': "",
+            'username': "",
+            'password': ""
+        }
 
-    # register helpers here
     def register(self):
+        """
+        This method registers a user
+        """
         return self.client.post('/api/v1/auth/register', data=json.dumps(self.user_data),
                                 content_type='application/json')
 
-    # login helpers here
     def login(self):
+        """
+            This method login a user
+        """
         return self.client.post('/api/v1/auth/login', data=json.dumps(self.login_data),
                                 content_type='application/json')
 
-    # Login for non user
     def login_non_user(self):
+        """
+        This method tries to login a non-registered user
+        """
         return self.client.post('/api/v1/auth/login', data=json.dumps(self.not_user), content_type='application/json')
 
-    # Ensure that user is registered
     def register_already_registered(self):
+        """
+        This method register already existing user
+        """
         return self.client.post('/api/v1/auth/register', data=json.dumps(self.registered_data),
                                 content_type='application/json')
 
@@ -78,7 +93,6 @@ class AuthTestCase(unittest.TestCase):
     def test_registration(self):
         """
         Test user registration
-        :return: registration success
         """
         register_user = self.register()
         self.assertEqual(register_user.status_code, 201)
@@ -88,7 +102,6 @@ class AuthTestCase(unittest.TestCase):
     def test_already_registered(self):
         """
         This test code helps to eliminate double registration
-        :return: error message
         """
         res = self.register_already_registered()
         self.assertEqual(res.status_code, 201)
@@ -100,7 +113,6 @@ class AuthTestCase(unittest.TestCase):
     def test_login_for_registered_user(self):
         """
         Test the login for user already registered.
-        :return: login successful
         """
         login_res = self.login()
         result = json.loads(login_res.data.decode())
@@ -110,7 +122,6 @@ class AuthTestCase(unittest.TestCase):
     def test_login_for_non_user(self):
         """
         Test non registered users cannot login
-        :return: error msg 401 (unauthorized)
         """
         res = self.login_non_user()
         result = json.loads(res.data.decode())
@@ -120,7 +131,6 @@ class AuthTestCase(unittest.TestCase):
     def test_reset_password(self):
         """"
         Test reset-password
-        :return: success when password length is met
         """
         res = self.client.post('/api/v1/auth/reset-password', data=json.dumps(self.user_data),
                                content_type='application/json')
@@ -131,7 +141,6 @@ class AuthTestCase(unittest.TestCase):
     def test_logout(self):
         """
         Test for logout already logged in
-        :return: success when in session
         """
         login_res = self.login()
         self.assertEqual(login_res.status_code, 200)
@@ -142,13 +151,33 @@ class AuthTestCase(unittest.TestCase):
     def test_short_password(self):
         """
         Test for short password
-        :return: Error message when password length is not met.
         """
         register_user = self.client.post('/api/v1/auth/register', data=json.dumps(self.short_pswd),
                                          content_type='application/json')
         self.assertEqual(register_user.status_code, 400)
         res = json.loads(register_user.data.decode())
         self.assertEqual(res["Message"], "Password is short!")
+
+    def test_empty_login_details(self):
+        """
+        Tests if user have not insert login details
+        """
+        empty_login_data = self.client.post('/api/v1/auth/login', data=json.dumps(self.empty_login_data),
+                                            content_type='application/json')
+        self.assertEqual(empty_login_data.status_code, 400)
+        res = json.loads(empty_login_data.data.decode())
+        self.assertEqual(res["Message"], "Fill all fields!")
+
+    def test_wrong_password(self):
+        """
+        Test if user has provided wrong password
+        """
+        wrong_password = self.client.post('/api/v1/auth/login', data=json.dumps(self.wrong_password_data),
+                                          content_type='application/json')
+        self.assertEqual(wrong_password.status_code, 401)
+        res = json.loads(wrong_password.data.decode())
+        self.assertEqual(res["Message"], "Wrong password!")
+
 
 if __name__ == '__main__':
     unittest.main()

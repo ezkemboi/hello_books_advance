@@ -1,18 +1,22 @@
-# global imports
+"""
+This file holds all the resources for user from registration to borrow books and return books
+"""
 from flask import Flask, session, render_template
 from flask_restful import Resource, Api, reqparse
 import re
 
-# Local imports
 from app.models import User, Book
 
 app = Flask(__name__)
-api = Api(app)
+api = Api(app, prefix='/api/v1')
 app.secret_key = 'mysecretkeyishere'
 
 
 @app.route('/')
 def index():
+    """
+    It holds the homepage url and renders the generated html doc for api documentation
+    """
     return render_template('docs.html')
 
 login_parser = reqparse.RequestParser()
@@ -21,11 +25,13 @@ login_parser.add_argument('password', type=str, help='Password', required=True)
 
 
 class UserLogin(Resource):
+    """
+    It holds user login functionality
+    """
 
     def post(self):
         """
         The post method logs in user
-        :return: success if requirement is met
         """
         args = login_parser.parse_args()
         email = args['email']
@@ -45,16 +51,18 @@ class UserLogin(Resource):
         else:
             return {"Message": "Wrong password!"}, 401
 
-register_parser = login_parser.copy()  # Copy the parsed arguments email and password from login parser.
+register_parser = login_parser.copy()
 register_parser.add_argument('username', type=str, help='Username', required=True)
 
 
 class UserRegistration(Resource):
+    """
+        It holds user registration functionality
+    """
 
     def post(self):
         """
         Post method for user registration
-        :return: success when requirements is met
         """
         args = register_parser.parse_args()
         email = args['email']
@@ -92,10 +100,12 @@ class UserRegistration(Resource):
 
 
 class UserLogout(Resource):
+    """
+        It holds user logout functionality
+    """
     def post(self):
         """
         Post Method to logout user
-        :return: Success if the user is logged in
         """
         session['logged_in'] = False
         return {"Message": "Your logged out."}, 200
@@ -105,10 +115,12 @@ reset_password_parser = login_parser.copy()
 
 
 class ResetPassword(Resource):
+    """
+        It holds user reset password functionality
+    """
     def post(self):
         """
         The method allow user to reset password
-        :return: Success on validation of new password length
         """
         args = reset_password_parser.parse_args()
         email = args['email']
@@ -143,7 +155,6 @@ class AddBook(Resource):
     def post(self):
         """
         Post method to allow addition of book
-        :return: Success message if met and error on fail criteria
         """
         args = add_book_parser.parse_args()
         book_id = args['book_id']
@@ -168,18 +179,10 @@ class AddBook(Resource):
     def get(self):
         """
         Get method to get all books
-        :return: all available books
         """
         available_books = Book.get_all_books()
-        all_books = []
         if available_books:
-            a_book = {
-                'book_id': available_books.book_id,
-                'book_title': available_books.book_title,
-                'authors': available_books.authors,
-            }
-            all_books.append(a_book)
-            return {"Books": all_books}, 200
+            return {available_books}, 200
         else:
             return {"Message": "Books not found."}
 
@@ -198,8 +201,6 @@ class SingleBook(Resource):
     def put(self, book_id):
         """
         Put method to edit already existing book
-        :param book_id:
-        :return: success
         """
         args = edit_book_parser.parse_args()
         get_book = Book.get_book_by_id(book_id)
@@ -222,8 +223,6 @@ class SingleBook(Resource):
     def delete(self, book_id):
         """
         Delete method to delete a single book
-        :param book_id:
-        :return: Success
         """
 
         if book_id:
@@ -236,8 +235,6 @@ class SingleBook(Resource):
     def get(self, book_id):
         """
         Get method for a single book
-        :param book_id:
-        :return: Single book
         """
         if book_id:
             get_book = Book.get_book_by_id(book_id)
@@ -249,37 +246,28 @@ class SingleBook(Resource):
             return {"Error": "Book not found."}, 404
 
 
-class Users(Resource):
+class Borrow(Resource):
+    """
+    This class hold function for user can borrow, return book and check history
+    """
 
     def post(self, book_id):
         """
         Post method for user to borrow book
-        :param book_id:
-        :return: success
         """
         get_book = Book.get_book_by_id(book_id)
         if get_book:
             Book.borrow_book(book_id)
             return {"Message": "successfully borrowed a book"}, 202
         else:
-            return {"Error": "Book not found."}, 404
+            return {"Message": "The book you want to borrow is unavailable."}, 404
 
 
-api.add_resource(UserRegistration, '/api/v1/auth/register')
-api.add_resource(UserLogin, '/api/v1/auth/login')
-api.add_resource(UserLogout, '/api/v1/auth/logout')
-api.add_resource(ResetPassword, '/api/v1/auth/reset-password')
+api.add_resource(UserRegistration, '/auth/register')
+api.add_resource(UserLogin, '/auth/login')
+api.add_resource(UserLogout, '/auth/logout')
+api.add_resource(ResetPassword, '/auth/reset-password')
 
-api.add_resource(AddBook, '/api/v1/books')
-api.add_resource(SingleBook, '/api/v1/books/<int:book_id>')
-api.add_resource(Users, '/api/v1/users/books/<int:book_id>')
-
-
-
-
-
-
-
-
-
-
+api.add_resource(AddBook, '/books')
+api.add_resource(SingleBook, '/books/<int:book_id>')
+api.add_resource(Borrow, '/users/books/<int:book_id>')
