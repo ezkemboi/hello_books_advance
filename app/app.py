@@ -10,6 +10,7 @@ from app.models import User, Book
 app = Flask(__name__)
 api = Api(app, prefix='/api/v1')
 app.secret_key = 'mysecretkeyishere'
+app.url_map.strict_slashes = False
 
 
 @app.route('/')
@@ -263,11 +264,11 @@ class Borrow(Resource):
             return {"Message": "The book you want to borrow is unavailable."}, 404
 
 
-api.add_resource(UserRegistration, '/auth/register')
-api.add_resource(UserLogin, '/auth/login')
-api.add_resource(UserLogout, '/auth/logout')
-api.add_resource(ResetPassword, '/auth/reset-password')
+api.add_resource(UserRegistration, '/auth/register/')
+api.add_resource(UserLogin, '/auth/login/')
+api.add_resource(UserLogout, '/auth/logout/')
+api.add_resource(ResetPassword, '/auth/reset-password/')
 
-api.add_resource(AddBook, '/books')
-api.add_resource(SingleBook, '/books/<int:book_id>')
-api.add_resource(Borrow, '/users/books/<int:book_id>')
+api.add_resource(AddBook, '/books/')
+api.add_resource(SingleBook, '/books/<int:book_id>/')
+api.add_resource(Borrow, '/users/books/<int:book_id>/')

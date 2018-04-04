@@ -1,3 +1,6 @@
+"""
+The file contains the for user functions including register, login, logout, reset-password and logout
+"""
 import unittest
 import json
 from app import app

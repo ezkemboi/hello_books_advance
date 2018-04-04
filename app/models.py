@@ -1,4 +1,6 @@
-
+"""
+The file contains all data models for the application
+"""
 list_of_users = []
 list_of_books = []
 
@@ -68,8 +70,8 @@ class Book(object):
         return list_of_books
 
     def save_book(self):
-        book_details = self.book_serializer(self)
-        list_of_books.append(book_details)
+        # book_details = self.book_serializer(self)
+        list_of_books.append(self)
 
     def delete_book(self):
         list_of_books.remove(self)

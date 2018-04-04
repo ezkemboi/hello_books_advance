@@ -24,7 +24,7 @@ Hello-Books is a simple application that helps manage a library and its processe
 |/api/auth/reset-password  |Password reset              |POST
 
    
-# Installing Application, Running and Running Tests
+# Installing Application and Running
 
    Clone the repo
    

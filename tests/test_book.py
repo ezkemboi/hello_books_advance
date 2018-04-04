@@ -1,3 +1,6 @@
+"""
+The file contains tests for books (Adding books, editing, deleting, borrowing and getting
+"""
 import unittest
 import json
 
