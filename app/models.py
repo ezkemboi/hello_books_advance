@@ -21,6 +21,12 @@ class User(object):
             if user.email == email:
                 return user
 
+    @staticmethod
+    def get_user_by_username(username):
+        for user in users:
+            if user.username == username:
+                return user
+
     def save_user(self):
         users.append(self)
 
@@ -41,20 +47,12 @@ class Book(object):
         self.book_id = None
         self.book_title = None
         self.authors = None
-        self.publisher = None
         self.year = None
-        self.isnb = None
 
     @staticmethod
     def get_book_by_id(book_id):
         for book in books:
             if book.book_id == book_id:
-                return book
-
-    @staticmethod
-    def get_book_by_isnb(isnb):
-        for book in books:
-            if book.isnb == isnb:
                 return book
 
     @staticmethod
@@ -64,6 +62,9 @@ class Book(object):
 
     def save_book(self):
         books.append(self)
+
+    def delete_book(self):
+        books.remove(self)
 
     @staticmethod
     def borrow_book(book_id):

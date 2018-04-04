@@ -11,5 +11,3 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
 
     return app
-
-
