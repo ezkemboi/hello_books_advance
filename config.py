@@ -1,3 +1,8 @@
+"""
+This file contains all application configurations
+"""
+
+
 class Config(object):
     """
     All common configurations for app goes here.

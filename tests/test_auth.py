@@ -88,8 +88,10 @@ class AuthTestCase(unittest.TestCase):
         return self.client.post('/api/v1/auth/register', data=json.dumps(self.registered_data),
                                 content_type='application/json')
 
-    # Try register a registered user
     def try_register_again(self):
+        """
+        The method registers an already registered user
+        """
         return self.client.post('/api/v1/auth/register', data=json.dumps(self.already_registered),
                                 content_type='application/json')
 
@@ -171,6 +173,16 @@ class AuthTestCase(unittest.TestCase):
         res = json.loads(empty_login_data.data.decode())
         self.assertEqual(res["Message"], "Fill all fields!")
 
+    def test_empty_register_details(self):
+        """
+        Tests if user have not insert register details
+        """
+        empty_register_data = self.client.post('/api/v1/auth/register', data=json.dumps(self.empty_register_data),
+                                               content_type='application/json')
+        self.assertEqual(empty_register_data.status_code, 400)
+        res = json.loads(empty_register_data.data.decode())
+        self.assertEqual(res["Message"], "Provide email, username and password!")
+
     def test_wrong_password(self):
         """
         Test if user has provided wrong password
@@ -180,7 +192,6 @@ class AuthTestCase(unittest.TestCase):
         self.assertEqual(wrong_password.status_code, 401)
         res = json.loads(wrong_password.data.decode())
         self.assertEqual(res["Message"], "Wrong password!")
-
 
 if __name__ == '__main__':
     unittest.main()

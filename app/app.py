@@ -1,9 +1,9 @@
 """
 This file holds all the resources for user from registration to borrow books and return books
 """
+import re
 from flask import Flask, session, render_template
 from flask_restful import Resource, Api, reqparse
-import re
 
 from app.models import User, Book
 
@@ -49,8 +49,7 @@ class UserLogin(Resource):
         elif log_in_user and password == log_in_user.password:
             session['logged_in'] = True
             return {'Message': "Successfully logged in."}, 200
-        else:
-            return {"Message": "Wrong password!"}, 401
+        return {"Message": "Wrong password!"}, 401
 
 register_parser = login_parser.copy()
 register_parser.add_argument('username', type=str, help='Username', required=True)
@@ -75,7 +74,7 @@ class UserRegistration(Resource):
         valid_username = re.match("[A-Za-z0-9@#$%^&+=]{4,}", username.strip())
         password_length = re.match("[A-Za-z0-9@#$%^&+=]{8,}", password.strip())
 
-        if email is None or username is None or password is None:
+        if not email or not username or not password:
             return {"Message": "Provide email, username and password!"}, 400
 
         username = User.get_user_by_username(username)
@@ -96,8 +95,7 @@ class UserRegistration(Resource):
                 create_user.password = password
                 create_user.save_user()
                 return {"Message": "The User is successfully Registered."}, 201
-        else:
-            return {"Message": "The user is already registered."}, 202
+        return {"Message": "The user is already registered."}, 202
 
 
 class UserLogout(Resource):
@@ -137,8 +135,7 @@ class ResetPassword(Resource):
                 update_email.password = password
                 update_email.save_user()
                 return {"Message": "Password is reset successfully."}, 200
-            else:
-                return {"Message": "Password is short!"}, 400
+            return {"Message": "Password is short!"}, 400
         return {"Message": "The email does not exist."}, 404
 
 add_book_parser = reqparse.RequestParser()
@@ -174,18 +171,17 @@ class AddBook(Resource):
             new_book.year = year
             new_book.save_book()
             return {"Message": "The book was added successfully."}, 201
-        else:
-            return {"Message": "You have entered wrong inputs."}, 400
+        return {"Message": "You have entered wrong inputs."}, 400
 
     def get(self):
         """
         Get method to get all books
         """
         available_books = Book.get_all_books()
-        if available_books:
-            return {available_books}, 200
-        else:
+        if not available_books:
             return {"Message": "Books not found."}
+        results = [available_book.book_serializer() for available_book in available_books]
+        return {"Books": results}, 200
 
 
 edit_book_parser = add_book_parser.copy()
@@ -198,7 +194,6 @@ class SingleBook(Resource):
     """
     Contains all activities of a single book, including editing, getting and removing a book.
     """
-
     def put(self, book_id):
         """
         Put method to edit already existing book
@@ -218,8 +213,7 @@ class SingleBook(Resource):
             edited_book.year = year
             edited_book.save_book()
             return {"Success": "Book Updated successfully."}, 200
-        else:
-            return {"Message": "The book is not found."}, 404
+        return {"Message": "The book is not found."}, 404
 
     def delete(self, book_id):
         """
@@ -242,8 +236,7 @@ class SingleBook(Resource):
             if get_book:
                 return {'book_id': get_book.book_id,
                         'book_title': get_book.book_title,
-                        'authors': get_book.authors
-                        }, 200
+                        'authors': get_book.authors}, 200
             return {"Error": "Book not found."}, 404
 
 
@@ -260,8 +253,7 @@ class Borrow(Resource):
         if get_book:
             Book.borrow_book(book_id)
             return {"Message": "successfully borrowed a book"}, 202
-        else:
-            return {"Message": "The book you want to borrow is unavailable."}, 404
+        return {"Message": "The book you want to borrow is unavailable."}, 404
 
 
 api.add_resource(UserRegistration, '/auth/register/')

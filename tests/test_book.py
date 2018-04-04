@@ -8,7 +8,10 @@ import run
 from app import app
 
 
-class AdminTestCase(unittest.TestCase):
+class UsersTestCase(unittest.TestCase):
+    """
+    This class contains all tests for users
+    """
 
     def setUp(self):
         """
@@ -27,8 +30,7 @@ class AdminTestCase(unittest.TestCase):
             'book_title': 'The Wonder Boy',
             'authors': 'john doe',
             'year': 2006,
-        }
-        ]
+        }]
 
     def add_book(self):
         """
