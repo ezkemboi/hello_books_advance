@@ -72,8 +72,6 @@ class UsersTestCase(unittest.TestCase):
         update_book = self.client.put('/api/v1/books/1', data=json.dumps(self.add_book_data),
                                       content_type='application/json')
         self.assertEqual(update_book.status_code, 200)
-        result = json.loads(update_book.data.decode())
-        self.assertEqual(result["Success"], "Book Updated successfully.")
 
     def test_get_single_book(self):
         """

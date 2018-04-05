@@ -206,13 +206,12 @@ class SingleBook(Resource):
         year = args['year']
 
         if get_book:
-            edited_book = Book()
-            edited_book.book_id = get_book.book_id
-            edited_book.book_title = book_title
-            edited_book.authors = authors
-            edited_book.year = year
-            edited_book.save_book()
-            return {"Success": "Book Updated successfully."}, 200
+            get_book.book_id = book_id
+            get_book.book_title = book_title
+            get_book.authors = authors
+            get_book.year = year
+            edited_book = [get_book.book_serializer()]
+            return {"Success": edited_book}, 200
         return {"Message": "The book is not found."}, 404
 
     def delete(self, book_id):
