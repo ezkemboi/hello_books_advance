@@ -26,7 +26,7 @@ Hello-Books is a simple application that helps manage a library and its processe
    
 # Installing Application and Running
 
-   Clone the repo
+   Clone the repo:   https://github.com/ezrqnkemboi/hello_books.git
    
    Then, install virtual environment: `pip install --user pipenv`
    
@@ -42,12 +42,12 @@ Hello-Books is a simple application that helps manage a library and its processe
    
 # Running tests
    
+   Cd to the directory of the application through: `cd hello_books`
+   
    To run test, use: `coverage run -m unittest discover`
     
-# Deployment
-   Link: `https://shielded-peak-77124.herokuapp.com`
-   
-   To create own heroku application: `heroku create`
+# Deployment Link
+   Link: https://shielded-peak-77124.herokuapp.com
 
 # Contributors
    Ezrqn Kemboi
