@@ -4,12 +4,17 @@ This file holds all the resources for user from registration to borrow books and
 import re
 from flask import Flask, session, render_template
 from flask_restful import Resource, Api, reqparse
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token,\
+    get_jwt_identity
+import random
+
 
 from app.models import User, Book
 
 app = Flask(__name__)
 api = Api(app, prefix='/api/v1')
 app.secret_key = 'mysecretkeyishere'
+jwt = JWTManager(app)
 app.url_map.strict_slashes = False
 
 # Define all parsers for all classes
@@ -23,13 +28,11 @@ register_parser.add_argument('username', type=str, help='Please enter the userna
 reset_password_parser = login_parser.copy()
 
 add_book_parser = reqparse.RequestParser()
-add_book_parser.add_argument('book_id', type=int, help='Please enter the BookId', required=True)
 add_book_parser.add_argument('book_title', type=str, help='Please enter the book title', required=True)
 add_book_parser.add_argument('authors', type=str, help='Please enter the authors name', required=True)
 add_book_parser.add_argument('year', type=int, help='Please enter the year published')
 
 edit_book_parser = add_book_parser.copy()
-edit_book_parser.remove_argument('book_id')
 delete_book_parser = reqparse.RequestParser()
 
 
@@ -45,6 +48,7 @@ class UserRegistration(Resource):
     def post(self):
         """Post method for user registration"""
         args = register_parser.parse_args()
+        user_id = random.randint(1111, 9999)
         email = args['email']
         username = args['username']
         password = args['password']
@@ -66,8 +70,9 @@ class UserRegistration(Resource):
                 return {"Message": "Password is short!"}, 400
             else:
                 create_user = User()
+                create_user.user_id = user_id
                 create_user.email = email
-                create_user.password = password
+                create_user.set_password(password)
                 create_user.save_user()
                 return {"Message": "The User is successfully Registered."}, 201
         return {"Message": "The user is already registered."}, 422
@@ -86,9 +91,10 @@ class UserLogin(Resource):
         log_in_user = User.get_user_by_email(email)
         if not log_in_user:
             return {"Message": "Invalid email!"}, 403
-        elif log_in_user and password == log_in_user.password:
+        elif log_in_user and log_in_user.check_password(password):
+            access_token = create_access_token(identity=email)
             session['logged_in'] = True
-            return {'Message': "Successfully logged in."}, 200
+            return {'Message': "Successfully logged in.", "Access token": access_token}, 200
         return {"Message": "Wrong password!"}, 401
 
 
@@ -116,7 +122,7 @@ class ResetPassword(Resource):
             password_length = re.match("[A-Za-z0-9@#$%^&+=]{8,}", password.strip())
             if password_length:
                 reset_user.email = email
-                reset_user.password = password
+                reset_user.set_password(password)
                 reset_user.user_serializer()
                 return {"Message": "Password is reset successfully."}, 200
             return {"Message": "Password is short!"}, 400
@@ -127,11 +133,10 @@ class AddBook(Resource):
     """
     Contains all the methods to add book, list all books
     """
-
     def post(self):
         """Post method to allow addition of book"""
         args = add_book_parser.parse_args()
-        book_id = args['book_id']
+        book_id = random.randint(1111, 9999)
         book_title = args['book_title']
         authors = args['authors']
         year = args['year']
@@ -170,8 +175,7 @@ class SingleBook(Resource):
         book_title = args['book_title']
         authors = args['authors']
         year = args['year']
-        if get_book:
-            get_book.book_id = book_id
+        if get_book and get_book.book_id == book_id:
             get_book.book_title = book_title
             get_book.authors = authors
             get_book.year = year
@@ -211,7 +215,6 @@ class Borrow(Resource):
             Book.borrow_book(book_id)
             return {"Message": "successfully borrowed a book"}, 202
         return {"Message": "The book you want to borrow is unavailable."}, 404
-
 
 # The registration of all endpoints
 api.add_resource(UserRegistration, '/auth/register/')

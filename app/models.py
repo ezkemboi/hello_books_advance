@@ -1,6 +1,8 @@
 """
 The file contains all data models for the application
 """
+from werkzeug.security import generate_password_hash, check_password_hash
+
 list_of_users = []
 list_of_books = []
 books_borrowed = []
@@ -13,6 +15,7 @@ class User(object):
 
     def __init__(self):
         """This method initializes the required items"""
+        self.user_id = None
         self.email = None
         self.username = None
         self.password = None
@@ -20,11 +23,18 @@ class User(object):
     def user_serializer(self):
         """Serialize the user data"""
         user_details = {
+            'user_id': self.user_id,
             'email': self.email,
             'username': self.username,
             'password': self.password
         }
         return user_details
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
     @staticmethod
     def get_user_by_email(email):
