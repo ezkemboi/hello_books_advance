@@ -16,6 +16,7 @@ class User(db.Model):
     email = db.Column(db.String, unique=True)
     username = db.Column(db.String, unique=True)
     password = db.Column(db.String)
+    borrows = db.relationship('Borrow', backref='users', lazy='dynamic')
 
     def __init__(self, user_id, email, username, password):
         """This method initializes the required items"""
@@ -38,9 +39,11 @@ class User(db.Model):
         return user_details
 
     def set_password(self, password):
+        """Method to set hashed password for the user"""
         self.password = generate_password_hash(password)
 
     def check_password(self, password):
+        """Method to check that password is valid"""
         return check_password_hash(self.password, password)
 
     @staticmethod
@@ -70,6 +73,7 @@ class Book(db.Model):
     book_title = db.Column(db.String)
     authors = db.Column(db.String)
     year = db.Column(db.String)
+    borrows = db.relationship('Borrow', backref='book', lazy='dynamic')
 
     def __init__(self, book_id, book_title, authors, year):
         """This method initializes book details"""
@@ -79,6 +83,7 @@ class Book(db.Model):
         self.year = year
 
     def __repr__(self):
+        """Represent object instance on query"""
         return "<Book_id {}>".format(self.book_id)
 
     def book_serializer(self):
@@ -111,6 +116,10 @@ class Book(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def update_book(self):
+        """Update a book edited by the admin"""
+        db.session.commit()
+
 
 class Borrow(db.Model):
     """Class holding the models for borrow and history"""
@@ -121,24 +130,33 @@ class Borrow(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'))
 
     def __init__(self, borrow_id, user_id, book_id):
+        """Initialize borrow details"""
         self.borrow_id = borrow_id
         self.user_id = user_id
         self.book_id = book_id
 
     def __repr__(self):
+        """Represent object instance on query"""
         return "<Borrow_id {}>".format(self.borrow_id)
 
     def save_borrowed_book(self):
+        """Save a book borrowed by the user"""
         db.session.add(self)
         db.session.commit()
 
     def return_borrowed_book(self):
+        """Method to allow user return book borrowed"""
         db.session.delete(self)
         db.commit()
 
     @staticmethod
-    def borrow_book(book_id):
-        """The method allow user to borrow an existing book"""
+    def get_all_borrowed():
+        """The method allow user get book that need to borrow"""
+        return Borrow.query.all()
+
+    @staticmethod
+    def get_borrow_book_by_id(book_id):
+        """Allow user get a single book borrowed"""
         return Borrow.query.get(book_id)
 
 
@@ -149,18 +167,36 @@ class UserBorrowHistory(db.Model):
 
     borrow_id = db.Column(db.Integer, db.ForeignKey('borrows.borrow_id'), primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'))
+    return_status = db.Column(db.Boolean, default=False)
 
     def __init__(self, borrow_id, book_id):
+        """Initialize the user history borrowing list"""
         self.borrow_id = borrow_id
         self.book_id = book_id
 
     def __repr__(self):
+        """Represent object instance on query"""
         return "<Borrow_id {}>".format(self.borrow_id)
 
+    def borrowing_history_serializer(self):
+        """Make a serializer for borrow history for user"""
+        borrow_history_details = {
+            'borrow_id': self.borrow_id,
+            'book_id': self.book_id
+        }
+        return borrow_history_details
+
     def save_borrow_history(self):
+        """Save books borrowed by the user"""
         db.session.save(self)
         db.session.commit()
 
     @staticmethod
     def get_borrow_history():
+        """Get all books borrowed by the user"""
         return UserBorrowHistory.query.all()
+
+    @staticmethod
+    def get_books_not_yet_returned():
+        return UserBorrowHistory.query.filter(
+            UserBorrowHistory.return_status.is_(False)).all()
