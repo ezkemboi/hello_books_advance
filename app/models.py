@@ -73,7 +73,7 @@ class Book(db.Model):
     book_title = db.Column(db.String)
     authors = db.Column(db.String)
     year = db.Column(db.String)
-    borrows = db.relationship('Borrow', backref='book', lazy='dynamic')
+    borrows = db.relationship('Borrow', backref='books', lazy='dynamic')
 
     def __init__(self, book_id, book_title, authors, year):
         """This method initializes book details"""
@@ -128,6 +128,7 @@ class Borrow(db.Model):
     borrow_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'))
+    histories = db.relationship('UserBorrowHistory', backref='borrows', lazy='dynamic')
 
     def __init__(self, borrow_id, user_id, book_id):
         """Initialize borrow details"""
