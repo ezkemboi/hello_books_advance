@@ -9,7 +9,7 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token,\
 import random
 
 
-from app.models import User, Book
+from .models import User, Book, Borrow, UserBorrowHistory
 
 app = Flask(__name__)
 api = Api(app, prefix='/api/v1')
