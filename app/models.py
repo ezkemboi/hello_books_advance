@@ -16,6 +16,7 @@ class User(db.Model):
     email = db.Column(db.String, unique=True)
     username = db.Column(db.String, unique=True)
     password = db.Column(db.String)
+    admin = db.Column(db.Boolean, default=False)
     borrows = db.relationship('Borrow', backref='users', lazy='dynamic')
 
     def __init__(self, user_id, email, username, password):
