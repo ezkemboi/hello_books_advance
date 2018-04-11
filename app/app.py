@@ -5,11 +5,11 @@ import re
 from flask import Flask, render_template
 from flask_restful import Resource, Api, reqparse
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token,\
-    get_jwt_identity, jwt_optional, create_refresh_token, get_raw_jwt, jwt_refresh_token_required
+    get_jwt_identity, create_refresh_token, get_raw_jwt, jwt_refresh_token_required
 import random
 
 
-from .models import User, Book, Borrow, UserBorrowHistory
+from .models import User, Book, Borrow, UserBorrowHistory, Admin
 
 app = Flask(__name__)
 api = Api(app, prefix='/api/v1')
@@ -43,9 +43,12 @@ add_book_parser = reqparse.RequestParser()
 add_book_parser.add_argument('book_title', type=str, help='Please enter the book title', required=True)
 add_book_parser.add_argument('authors', type=str, help='Please enter the authors name', required=True)
 add_book_parser.add_argument('year', type=int, help='Please enter the year published')
+add_book_parser.add_argument('no_of_copies', type=int, help='Enter the number of copies')
+add_book_parser.add_argument('username', type=str, help='Please enter admin username')
 
 edit_book_parser = add_book_parser.copy()
 delete_book_parser = reqparse.RequestParser()
+delete_book_parser.add_argument('username', type=str, help='Please enter admin username')
 
 
 @app.route('/')
@@ -153,39 +156,39 @@ class AddBook(Resource):
     @jwt_refresh_token_required
     def post(self):
         """Post method to allow addition of book"""
+        args = add_book_parser.parse_args()
         current_user = get_jwt_identity()
         refresh_token = {
             'access_token': create_access_token(identity=current_user)
         }
-        if refresh_token:
-            args = add_book_parser.parse_args()
-            book_id = random.randint(1111, 9999)
-            book_title = args['book_title']
-            authors = args['authors']
-            year = args['year']
-            existing_id = Book.get_book_by_id(book_id)
-            if not book_title or not authors:
-                return {"Message": "Please fill all the details."}, 400
-            if existing_id:
-                return {"Message": "A book with that id already exist."}, 400
-            elif not existing_id:
-                new_book = Book(book_id, book_title, authors, year)
-                new_book.book_id = book_id
-                new_book.book_title = book_title
-                new_book.authors = authors
-                new_book.year = year
-                new_book.save_book()
-                result = new_book.book_serializer()
-                return {"Message": "The book was added successfully.", "Book Added": result}, 201
+        username = args['username']
+        confirm_admin = Admin.get_admin(username)
+        if refresh_token and confirm_admin:
+            no_of_copies = args['no_of_copies']
+            book_quantity = 0
+            while book_quantity <= no_of_copies:
+                book_id = random.randint(1111, 9999)
+                book_title = args['book_title']
+                authors = args['authors']
+                year = args['year']
+                existing_id = Book.get_book_by_id(book_id)
+                if not book_title or not authors:
+                    return {"Message": "Please fill all the details."}, 400
+                if existing_id:
+                    return {"Message": "A book with that id already exist."}, 400
+                elif not existing_id:
+                    new_book = Book(book_id, book_title, authors, year)
+                    new_book.book_id = book_id
+                    new_book.book_title = book_title
+                    new_book.authors = authors
+                    new_book.year = year
+                    new_book.save_book()
+                    book_quantity += 1
+                    result = new_book.book_serializer()
+                    return {"Message": "The book was added successfully.", "Book Added": result}, 201
 
-    @jwt_optional
     def get(self):
         """Get method to get all books"""
-        current_user = get_jwt_identity()
-        if current_user:
-            return {"Logged_in_as": current_user}, 200
-        if not current_user:
-            return {"Logged_in_as": "Guest"}, 200
         available_books = Book.get_all_books()
         if not available_books:
             return {"Message": "Books not found."}, 404
@@ -201,18 +204,20 @@ class SingleBook(Resource):
     @jwt_refresh_token_required
     def put(self, book_id):
         """Put method to edit already existing book"""
+        args = edit_book_parser.parse_args()
         current_user = get_jwt_identity()
         refresh_token = {
             'access_token': create_access_token(identity=current_user)
         }
-        if refresh_token:
-            args = edit_book_parser.parse_args()
+        username = args['username']
+        confirm_admin = Admin.get_admin(username)
+        if refresh_token and confirm_admin:
+            if not book_id:
+                return {"Message": "The book is not found."}, 404
             get_book = Book.get_book_by_id(book_id)
             book_title = args['book_title']
             authors = args['authors']
             year = args['year']
-            if not book_id:
-                return {"Message": "The book is not found."}, 404
             if get_book and get_book.book_id == book_id:
                 get_book.book_title = book_title
                 get_book.authors = authors
@@ -224,11 +229,14 @@ class SingleBook(Resource):
     @jwt_refresh_token_required
     def delete(self, book_id):
         """Delete method to delete a single book"""
+        args = delete_book_parser.parse_args()
         current_user = get_jwt_identity()
         refresh_token = {
             'access_token': create_access_token(identity=current_user)
         }
-        if refresh_token:
+        username = args['username']
+        confirm_admin = Admin.get_admin(username)
+        if refresh_token and confirm_admin:
             if book_id:
                 get_book_id = Book.get_book_by_id(book_id)
                 if get_book_id:
@@ -251,13 +259,14 @@ class BorrowBook(Resource):
     This class hold function for user can borrow, return book and check history
     """
     @jwt_refresh_token_required
-    def post(self, book_id):
+    def post(self, book_id, user_id):
         """Post method for user to borrow book"""
         current_user = get_jwt_identity()
         refresh_token = {
             'access_token': create_access_token(identity=current_user)
         }
-        if refresh_token:
+        confirm_user = User.get_user_by_id(user_id)
+        if refresh_token and confirm_user:
             get_book = Book.get_book_by_id(book_id)
             if not get_book:
                 return {"Message": "The book you want to borrow is unavailable."}, 404
@@ -265,13 +274,14 @@ class BorrowBook(Resource):
             return {"Message": "successfully borrowed the book", "Book": borrow_book}, 202
 
     @jwt_refresh_token_required
-    def put(self, book_id):
+    def put(self, book_id, user_id):
         """Put method to allow user return book"""
         current_user = get_jwt_identity()
         refresh_token = {
             'access_token': create_access_token(identity=current_user)
         }
-        if refresh_token:
+        confirm_user = User.get_user_by_id(user_id)
+        if refresh_token and confirm_user:
             return_book = Borrow.get_borrow_book_by_id(book_id)
             if return_book:
                 Borrow.return_borrowed_book(book_id)
@@ -283,10 +293,11 @@ class BorrowHistory(Resource):
     This class contains the book borrowing history
     """
     @jwt_required
-    def get(self):
+    def get(self, user_id):
         """It returns the users borrowing history"""
         current_user = get_jwt_identity()
-        if current_user:
+        confirm_id = User.get_user_by_id(user_id)
+        if current_user and confirm_id:
             borrow_history_books = UserBorrowHistory.get_borrow_history()
             if not borrow_history_books:
                 return {"Message": "You have not borrowed any book."}, 404
@@ -298,10 +309,11 @@ class BorrowHistory(Resource):
 class UnReturnedBooks(Resource):
     """Contains a list of books that a user has not yet returned"""
     @jwt_required
-    def get(self):
+    def get(self, user_id):
         """User history of books not yet returned"""
         current_user = get_jwt_identity()
-        if current_user:
+        confirm_id = User.get_user_by_id(user_id)
+        if current_user and confirm_id:
             un_returned_books = UserBorrowHistory.get_books_not_yet_returned()
             if not un_returned_books:
                 return {"Message": "Currently you do not have un-returned books"}, 404
