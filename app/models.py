@@ -76,8 +76,8 @@ class Admin(User):
     admin = db.Column(db.Boolean, default=True)
 
     @staticmethod
-    def get_admin(username):
-        return Admin.query.get(username)
+    def get_admin(user_id):
+        return Admin.query.get(user_id)
 
 
 class Book(db.Model):
@@ -219,3 +219,19 @@ class UserBorrowHistory(db.Model):
     def get_books_not_yet_returned():
         return UserBorrowHistory.query.filter(
             UserBorrowHistory.return_status.is_(False)).all()
+
+
+class RevokedToken(db.Model):
+    """Holds the tokens"""
+    __tablename__ = 'revoked_tokens'
+    id = db.Column(db.Integer, primary_key=True)
+    jti = db.Column(db.String)
+
+    def add(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def is_jti_blacklist(cls, jti):
+        confirm_blacklist = cls.query.filter_by(jti=jti).first()
+        return bool(confirm_blacklist)

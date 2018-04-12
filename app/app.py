@@ -1,6 +1,7 @@
 """
 This file holds all the resources for user from registration to borrow books and return books
 """
+import datetime
 import re
 from flask import Flask, render_template
 from flask_restful import Resource, Api, reqparse
@@ -9,7 +10,7 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token,\
 import random
 
 
-from .models import User, Book, Borrow, UserBorrowHistory, Admin
+from .models import User, Book, Borrow, UserBorrowHistory, Admin, RevokedToken
 
 app = Flask(__name__)
 api = Api(app, prefix='/api/v1')
@@ -17,17 +18,23 @@ app.secret_key = 'mysecretkeyishere'
 app.config['JWT_SECRET_KEY'] = '123$%##ghdsertes#$2'
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
+app.config.setdefault('JWT_TOKEN_LOCATION', ['headers'])
+app.config.setdefault('JWT_HEADER_NAME', 'Authorization')
+app.config.setdefault('JWT_HEADER_TYPE', '')
+app.config.setdefault('JWT_ACCESS_TOKEN_EXPIRES', datetime.timedelta(minutes=15))
+app.config.setdefault('JWT_REFRESH_TOKEN_EXPIRES', datetime.timedelta(days=30))
+app.config.setdefault('JWT_ALGORITHM', 'HS256')
+app.config['JWT_IDENTITY_CLAIM'] = ['identity']
+app.config['JWT_USER_CLAIMS'] = ['user_claims']
 jwt = JWTManager(app)
 app.url_map.strict_slashes = False
-
-# Set blacklist
-blacklist = set()
+PROPAGATE_EXCEPTIONS = True
 
 
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
-    return jti in blacklist
+    return RevokedToken.is_jti_blacklist(jti)
 
 # Define all parsers for all classes
 login_parser = reqparse.RequestParser()
@@ -44,11 +51,9 @@ add_book_parser.add_argument('book_title', type=str, help='Please enter the book
 add_book_parser.add_argument('authors', type=str, help='Please enter the authors name', required=True)
 add_book_parser.add_argument('year', type=int, help='Please enter the year published')
 add_book_parser.add_argument('no_of_copies', type=int, help='Enter the number of copies')
-add_book_parser.add_argument('username', type=str, help='Please enter admin username')
 
 edit_book_parser = add_book_parser.copy()
 delete_book_parser = reqparse.RequestParser()
-delete_book_parser.add_argument('username', type=str, help='Please enter admin username')
 
 
 @app.route('/')
@@ -124,7 +129,8 @@ class UserLogout(Resource):
     def post(self):
         """Post Method to logout user"""
         jti = get_raw_jwt()['jti']
-        blacklist.add(jti)
+        revoked_token = RevokedToken(jti=jti)
+        revoked_token.add()
         return {"Message": "Your logged out."}, 200
 
 
@@ -154,15 +160,15 @@ class AddBook(Resource):
     Contains all the methods to add book, list all books
     """
     @jwt_refresh_token_required
-    def post(self):
+    def post(self, user_id):
+        print("yes")
         """Post method to allow addition of book"""
         args = add_book_parser.parse_args()
         current_user = get_jwt_identity()
         refresh_token = {
             'access_token': create_access_token(identity=current_user)
         }
-        username = args['username']
-        confirm_admin = Admin.get_admin(username)
+        confirm_admin = Admin.get_admin(user_id)
         if refresh_token and confirm_admin:
             no_of_copies = args['no_of_copies']
             book_quantity = 0
@@ -202,15 +208,14 @@ class SingleBook(Resource):
     Contains all activities of a single book, including editing, getting and removing a book.
     """
     @jwt_refresh_token_required
-    def put(self, book_id):
+    def put(self, book_id, user_id):
         """Put method to edit already existing book"""
         args = edit_book_parser.parse_args()
         current_user = get_jwt_identity()
         refresh_token = {
             'access_token': create_access_token(identity=current_user)
         }
-        username = args['username']
-        confirm_admin = Admin.get_admin(username)
+        confirm_admin = Admin.get_admin(user_id)
         if refresh_token and confirm_admin:
             if not book_id:
                 return {"Message": "The book is not found."}, 404
@@ -227,15 +232,13 @@ class SingleBook(Resource):
                 return {"Success": edited_book}, 200
 
     @jwt_refresh_token_required
-    def delete(self, book_id):
+    def delete(self, book_id, user_id):
         """Delete method to delete a single book"""
-        args = delete_book_parser.parse_args()
         current_user = get_jwt_identity()
         refresh_token = {
             'access_token': create_access_token(identity=current_user)
         }
-        username = args['username']
-        confirm_admin = Admin.get_admin(username)
+        confirm_admin = Admin.get_admin(user_id)
         if refresh_token and confirm_admin:
             if book_id:
                 get_book_id = Book.get_book_by_id(book_id)
