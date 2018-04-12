@@ -55,6 +55,12 @@ add_book_parser.add_argument('no_of_copies', type=int, help='Enter the number of
 edit_book_parser = add_book_parser.copy()
 delete_book_parser = reqparse.RequestParser()
 
+get_book_parser = reqparse.RequestParser()
+get_book_parser.add_argument('page', type=int, help='Enter page number, default=1')
+get_book_parser.add_argument('limit', type=int, help='Enter limit per page, default=20')
+
+get_borrow_history = get_book_parser.copy()
+
 
 @app.route('/')
 def index():
@@ -161,7 +167,6 @@ class AddBook(Resource):
     """
     @jwt_refresh_token_required
     def post(self, user_id):
-        print("yes")
         """Post method to allow addition of book"""
         args = add_book_parser.parse_args()
         current_user = get_jwt_identity()
@@ -195,11 +200,29 @@ class AddBook(Resource):
 
     def get(self):
         """Get method to get all books"""
-        available_books = Book.get_all_books()
-        if not available_books:
+        args = get_book_parser.parse_args()
+        page = args['page']
+        limit = args['limit']
+        books = Book.query.paginate(page=page, per_page=limit, error_out=True)
+        all_books = books.items
+        num_results = books.total
+        total_pages = books.pages
+        current_page = books.page
+        has_next_page = books.has_next
+        has_prev_page = books.has_prev
+        prev_num = books.prev_num
+        next_num = books.next_num
+        if not all_books:
             return {"Message": "Books not found."}, 404
-        results = [available_book.book_serializer() for available_book in available_books]
-        return {"Books": results}, 200
+        output = [book.book_serializer() for book in all_books]
+        return {
+            "total results": num_results,
+            "total pages": total_pages,
+            "current page": current_page,
+            "all books": output,
+            "previous page": prev_num,
+            "next page": next_num
+               }, 200
 
 
 class SingleBook(Resource):
@@ -298,15 +321,33 @@ class BorrowHistory(Resource):
     @jwt_required
     def get(self, user_id):
         """It returns the users borrowing history"""
+        args = get_borrow_history.parse_args()
+        page = args['page']
+        limit = args['limit']
+        borrowed_books = UserBorrowHistory.query.paginate(page=page, per_page=limit, error_out=True)
+        all_borrowed_books = borrowed_books.items
+        total_results = borrowed_books.total
+        total_pages = borrowed_books.pages
+        current_page = borrowed_books.page
+        has_next_page = borrowed_books.has_next
+        has_prev_page = borrowed_books.has_prev
+        prev_num = borrowed_books.prev_num
+        next_num = borrowed_books.next_num
         current_user = get_jwt_identity()
         confirm_id = User.get_user_by_id(user_id)
         if current_user and confirm_id:
-            borrow_history_books = UserBorrowHistory.get_borrow_history()
-            if not borrow_history_books:
+            if not all_borrowed_books:
                 return {"Message": "You have not borrowed any book."}, 404
             results = [borrow_history_book.borrowing_history_serializer()
-                       for borrow_history_book in borrow_history_books]
-            return {"Borrowed Books": results}, 200
+                       for borrow_history_book in all_borrowed_books]
+            return {
+                "total results": total_results,
+                "total pages": total_pages,
+                "current page": current_page,
+                "results": results,
+                "previous page": prev_num,
+                "next page": next_num
+                   }, 200
 
 
 class UnReturnedBooks(Resource):
@@ -314,15 +355,35 @@ class UnReturnedBooks(Resource):
     @jwt_required
     def get(self, user_id):
         """User history of books not yet returned"""
+        args = get_borrow_history.parse_args()
+        page = args['page']
+        limit = args['limit']
         current_user = get_jwt_identity()
         confirm_id = User.get_user_by_id(user_id)
         if current_user and confirm_id:
             un_returned_books = UserBorrowHistory.get_books_not_yet_returned()
+            un_returned_history = UserBorrowHistory.query.paginate(page=page, per_page=limit, error_out=True)
+            all_unreturned_books = un_returned_history.items
+            total_results = un_returned_history.total
+            all_pages = un_returned_history.pages
+            current_page = un_returned_history.page
+            has_next_page = un_returned_history.has_next
+            has_prev_page = un_returned_history.has_prev
+            prev_num = un_returned_history.prev_num
+            next_num = un_returned_history.next_num
             if not un_returned_books:
                 return {"Message": "Currently you do not have un-returned books"}, 404
-            results = [un_returned_book.borrowing_history_serializer()
-                       for un_returned_book in un_returned_books]
-            return {"Un-returned books": results}, 200
+            if un_returned_history and un_returned_books:
+                results = [un_returned_book.borrowing_history_serializer()
+                           for un_returned_book in all_unreturned_books]
+                return {
+                           "total results": total_results,
+                           "total pages": all_pages,
+                           "current page": current_page,
+                           "results": results,
+                           "previous page": prev_num,
+                           "next page": next_num
+                       }, 200
 
 
 # The registration of all endpoints
