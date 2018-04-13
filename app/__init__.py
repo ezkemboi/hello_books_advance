@@ -4,7 +4,7 @@ This module initializes the application
 from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
 
-from config import app_config
+from instance.config import app_config
 
 db = SQLAlchemy()
 

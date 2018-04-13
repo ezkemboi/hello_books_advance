@@ -2,11 +2,10 @@
 The file contains tests for books (Adding books, editing, deleting, borrowing and getting
 """
 import unittest
+import os
 import json
 
-import run
-from app import create_app
-from app.models import db
+from app import create_app, db
 
 
 class UsersTestCase(unittest.TestCase):
@@ -15,12 +14,12 @@ class UsersTestCase(unittest.TestCase):
     def setUp(self):
         """This set environment and initialize application"""
         self.app = create_app(config_name='testing')
-        self.client = run.app.test_client()
+        self.client = self.app.test_client()
         self.add_book_data = {
-            "book_id": 2345,
-            'book_title': 'The Wonder Boy',
-            'authors': 'john doe',
-            'year': 2006,
+            'book_id': "2345",
+            'book_title': "The Wonder Boy",
+            'authors': "john doe",
+            'year': "2006",
         }
 
         with self.app.app_context():
@@ -46,7 +45,8 @@ class UsersTestCase(unittest.TestCase):
 
     def test_get_all_books(self):
         """Test user can get all books"""
-        self.add_book()
+        add_book = self.add_book()
+        self.assertEqual(add_book.status_code, 201)
         get_all_books = self.client.get('/api/v1/books')
         self.assertEqual(get_all_books.status_code, 200)
 
@@ -54,7 +54,6 @@ class UsersTestCase(unittest.TestCase):
         """Test a user borrowing unavailable book"""
         res = self.client.post('/api/v1/users/books/1267')
         self.assertEqual(res.status_code, 404)
-
 
 if __name__ == '__main__':
     unittest.main()
