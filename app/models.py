@@ -2,6 +2,9 @@
 The file contains all data models for the application
 """
 from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+from datetime import datetime, timedelta
+from flask import current_app
 
 from app import db
 
@@ -50,7 +53,7 @@ class User(db.Model):
     @staticmethod
     def get_user_by_email(email):
         """This method allow to filter users by their email"""
-        return User.query.filter_by(email=email).first
+        return User.query.filter_by(email=email).first()
 
     @staticmethod
     def get_user_by_username(username):
@@ -66,6 +69,34 @@ class User(db.Model):
         """The method is used to save the user in the list"""
         db.session.add(self)
         db.session.commit()
+
+    def generate_token(self, user_id):
+        """Generate token for user authentication"""
+        try:
+            payload = {
+                'exp': datetime.utcnow() + timedelta(minutes=10),
+                'iat': datetime.utcnow(),
+                'sub': user_id
+            }
+            jwt_string = jwt.encode(
+                payload,
+                current_app.config.get('SECRET'),
+                algorithm='HS256'
+            )
+            return jwt_string
+        except Exception as e:
+            return str(e)
+
+    @staticmethod
+    def decode_token(token):
+        """Decode the generated token via the authorization header"""
+        try:
+            payload = jwt.decode(token, current_app.config.get('SECRET'))
+            return payload['sub']
+        except jwt.ExpiredSignatureError:
+            return "This token is expired. Please login to get new token"
+        except jwt.InvalidTokenError:
+            return "Invalid token. Please register or login"
 
 
 class Admin(User):
@@ -91,6 +122,7 @@ class Book(db.Model):
     book_title = db.Column(db.String)
     authors = db.Column(db.String)
     year = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
     borrows = db.relationship('Borrow', backref='books', lazy='dynamic')
 
     def __init__(self, book_id, book_title, authors, year):
@@ -144,8 +176,8 @@ class Borrow(db.Model):
     __tablename__ = 'borrows'
 
     borrow_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'))
+    user_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
+    book_id = db.Column(db.Integer, db.ForeignKey(Book.book_id))
     histories = db.relationship('UserBorrowHistory', backref='borrows', lazy='dynamic')
 
     def __init__(self, borrow_id, user_id, book_id):
@@ -185,7 +217,8 @@ class UserBorrowHistory(db.Model):
     __tablename__ = 'histories'
 
     borrow_id = db.Column(db.Integer, db.ForeignKey('borrows.borrow_id'), primary_key=True)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'))
+    book_id = db.Column(db.Integer, db.ForeignKey(Book.book_id))
+    user_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
     return_status = db.Column(db.Boolean, default=False)
 
     def __init__(self, borrow_id, book_id):
@@ -221,17 +254,30 @@ class UserBorrowHistory(db.Model):
             UserBorrowHistory.return_status.is_(False)).all()
 
 
-class RevokedToken(db.Model):
-    """Holds the tokens"""
-    __tablename__ = 'revoked_tokens'
-    id = db.Column(db.Integer, primary_key=True)
-    jti = db.Column(db.String)
+class BlacklistToken(db.Model):
+    """
+    Create a table for blacklisted tokens
+    """
+    __tablename__ = "blacklisted_tokens"
 
-    def add(self):
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.column(db.String)
+    blacklisted = db.Column(db.DateTime, nullable=False)
+
+    def __init__(self, token):
+        """Initialize token balcklist"""
+        self.token = token
+        self.blacklisted = datetime.utcnow()
+
+    def save_token(self):
+        """Save blacklisted token"""
         db.session.add(self)
         db.session.commit()
 
-    @classmethod
-    def is_jti_blacklist(cls, jti):
-        confirm_blacklist = cls.query.filter_by(jti=jti).first()
-        return bool(confirm_blacklist)
+    @staticmethod
+    def check_blacklisted(token):
+        blacklisted = BlacklistToken.query.filter_by(
+            token=str(token)).first()
+        if blacklisted:
+            return True
+        return False
