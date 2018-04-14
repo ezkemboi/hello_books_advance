@@ -2,18 +2,13 @@
 This file holds all the resources for user from registration to borrow books and return books
 """
 import re
-from flask import Flask, render_template, request
+from flask import render_template, request
 from functools import wraps
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, reqparse
 import random
-
-
+# from app import User, Book, Borrow, UserBorrowHistory, BlacklistToken, app, api, db
 from .models import User, Book, Borrow, UserBorrowHistory, BlacklistToken
-
-app = Flask(__name__)
-api = Api(app, prefix='/api/v1')
-app.secret_key = 'mysecretkeyishere'
-app.url_map.strict_slashes = False
+from app import app, api
 
 # Define all parsers for all classes
 login_parser = reqparse.RequestParser()
@@ -362,17 +357,3 @@ class UnReturnedBooks(Resource):
                        "previous page": prev_num,
                        "next page": next_num
                    }, 200
-
-
-# The registration of all endpoints
-api.add_resource(UserRegistration, '/auth/register/')
-api.add_resource(UserLogin, '/auth/login/')
-api.add_resource(UserLogout, '/auth/logout/')
-api.add_resource(ResetPassword, '/auth/reset-password/')
-
-api.add_resource(AddBook, '/books/')
-api.add_resource(SingleBook, '/books/<int:book_id>/')
-
-api.add_resource(BorrowBook, '/users/books/<int:book_id>/')
-api.add_resource(BorrowHistory, '/users/books')
-api.add_resource(UnReturnedBooks, '/users/books?returned=false')
