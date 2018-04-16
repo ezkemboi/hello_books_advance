@@ -7,7 +7,7 @@ from functools import wraps
 from flask_restful import Resource, reqparse
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
-from .models import User, Book, Borrow, UserBorrowHistory, BlacklistToken
+from .models import User, Book, Borrow, BlacklistToken
 from app import app
 
 # Define all parsers for all classes
@@ -270,4 +270,7 @@ class UnReturnedBooks(Resource):
 
     def get(self, current_user):
         """User history of books not yet returned"""
-        pass
+        # un_returned_books = Borrow.query.filter(Borrow.return_status.is_(False)).all()
+        un_returned_books = Borrow.query.filter_by(user_id=current_user.user_id, return_status=False)
+        return un_returned_books
+
