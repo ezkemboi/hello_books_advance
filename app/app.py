@@ -135,6 +135,7 @@ class ResetPassword(Resource):
     """
         It holds user reset password functionality
     """
+
     def post(self):
         """The method allow user to reset password"""
         args = reset_password_parser.parse_args()
@@ -143,10 +144,10 @@ class ResetPassword(Resource):
         if not reset_user:
             return {"Message": "The email does not exist."}, 404
         password = args['password']
+        hashed_password = generate_password_hash(password, method='sha256')
         password_length = re.match("[A-Za-z0-9@#$%^&+=]{8,}", password.strip())
         if not password_length:
             return {"Message": "Password is short!"}, 400
-        hashed_password = generate_password_hash(reset_user.password, method='sha256')
         reset_user.password = hashed_password
         reset_user.update_user()
         return {"Message": "Password is reset successfully."}, 200
@@ -198,7 +199,9 @@ class SingleBook(Resource):
         book_title = args['book_title']
         authors = args['authors']
         year = args['year']
-        if get_book and get_book.book_id == book_id:
+        if not get_book:
+            return {"The book is not found"}, 40
+        if get_book:
             get_book.book_title = book_title
             get_book.authors = authors
             get_book.year = year
