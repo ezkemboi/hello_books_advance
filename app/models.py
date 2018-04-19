@@ -133,13 +133,14 @@ class Borrow(db.Model):
     borrow_id = db.Column(db.Integer, primary_key=True, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
     book_id = db.Column(db.Integer, db.ForeignKey(Book.book_id))
-    # return_status = db.Column(db.Boolean, default=False)
+    returned = db.Column(db.Boolean)
 
-    def __init__(self, borrow_id, user_id, book_id):
+    def __init__(self, borrow_id, user_id, book_id, returned):
         """Initialize borrow details"""
         self.borrow_id = borrow_id
         self.user_id = user_id
         self.book_id = book_id
+        self.returned = returned
 
     def __repr__(self):
         """Represent object instance on query"""
@@ -151,6 +152,7 @@ class Borrow(db.Model):
             'borrow_id': self.borrow_id,
             'book_id': self.book_id,
             'user_id': self.user_id,
+            'returned': self.returned
         }
         return borrow_details
 
@@ -160,9 +162,7 @@ class Borrow(db.Model):
         db.session.commit()
 
     def return_borrowed_book(self):
-        """Method to allow user return book borrowed"""
-        db.session.delete(self)
-        db.commit()
+        db.session.commit()
 
 
 class BlacklistToken(db.Model):

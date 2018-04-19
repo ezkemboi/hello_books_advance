@@ -200,7 +200,7 @@ class SingleBook(Resource):
         authors = args['authors']
         year = args['year']
         if not get_book:
-            return {"The book is not found"}, 40
+            return {"The book is not found"}, 404
         if get_book:
             get_book.book_title = book_title
             get_book.authors = authors
@@ -236,19 +236,24 @@ class BorrowBook(Resource):
     def post(self, current_user, book_id):
         """Post method for user to borrow book"""
         available_book = Book.query.filter_by(book_id=book_id).first()
+        returned = False
         if available_book:
             borrow_book = Borrow(borrow_id=random.randint(1111, 9999),
-                                 book_id=book_id, user_id=current_user.user_id)
+                                 book_id=book_id, user_id=current_user.user_id, returned=returned)
             borrow_book.save_borrowed_book()
             result = borrow_book.borrow_serializer()
-            return {"Book borrowed": result}, 202
+            return {"Book borrowed": result}, 200
+        return {"Message": "The book with that id is not found"}, 404
 
     def put(self, current_user, book_id):
         """Put method to allow user return book"""
-        return_book = Borrow.query.filter_by(book_id=book_id).first()
+        return_book = Borrow.query.filter_by(book_id=book_id, returned=False).first()
         if return_book:
-            Borrow.return_borrowed_book(book_id)
-            return {"Message": "You have returned the book successfully."}, 202
+            return_book.user_id = current_user.user_id
+            return_book.returned = True
+            return_book.return_borrowed_book()
+            return {"Message": "You have returned the book successfully."}, 200
+        return {"Message": "Your trying to return unidentified book"}, 400
 
 
 class BorrowHistory(Resource):
@@ -257,14 +262,15 @@ class BorrowHistory(Resource):
     """
     method_decorators = [token_required]
 
-    def get(self, current_user, user_id):
+    def get(self, current_user):
         """It returns the users borrowing history"""
+        user_id = current_user.user_id
         all_borrowed_books = Borrow.query.filter_by(user_id=user_id)
         if not all_borrowed_books:
             return {"Message": "You have not borrowed any book."}, 404
         results = [user_borrows.borrow_serializer()
                    for user_borrows in all_borrowed_books]
-        return {"Borrowing history list": results}
+        return {"The list of books borrowed are ": results}
 
 
 class UnReturnedBooks(Resource):
@@ -273,7 +279,12 @@ class UnReturnedBooks(Resource):
 
     def get(self, current_user):
         """User history of books not yet returned"""
-        # un_returned_books = Borrow.query.filter(Borrow.return_status.is_(False)).all()
-        un_returned_books = Borrow.query.filter_by(user_id=current_user.user_id, return_status=False)
-        return un_returned_books
+        returned = False
+        un_returned_books = Borrow.query.filter_by(returned=returned)
+        # un_returned_books = Borrow.query.filter(Borrow.returned.is_(False)).first()
+        if not un_returned_books:
+            return {"Message": "You do not have books that are un-returned"}, 404
+        results = [user_unreturn.borrow_serializer() for user_unreturn in un_returned_books]
+        return {"Here is unreturned books ": results}, 200
+
 
