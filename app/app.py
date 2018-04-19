@@ -28,6 +28,10 @@ add_book_parser.add_argument('year', type=int, help='Please enter the year publi
 edit_book_parser = add_book_parser.copy()
 delete_book_parser = reqparse.RequestParser()
 
+get_parser = reqparse.RequestParser()
+get_parser.add_argument('page', type=int, help="Please enter page", default=2)
+get_parser.add_argument('limit', type=int, help="Please enter page limit", default=5)
+
 
 def token_required(function):
     """This function require token to access routes"""
@@ -177,11 +181,29 @@ class AddBook(Resource):
 
     def get(self):
         """Get method to get all books"""
-        books = Book.query.all()
-        if not books:
+        args = get_parser.parse_args()
+        page = args['page']
+        limit = args['limit']
+        books = Book.query.paginate(page=page, per_page=limit)
+        all_books = books.items
+        num_results = books.total
+        total_pages = books.pages
+        current_page = books.page
+        has_next_page = books.has_next
+        has_prev_page = books.has_prev
+        prev_num = books.prev_num
+        next_num = books.next_num
+        if not all_books:
             return {"Message": "Books not found"}, 404
-        results = [book.book_serializer() for book in books]
-        return {"Books": results}, 200
+        results = [book.book_serializer() for book in all_books]
+        return {
+            "Total results": num_results,
+            "Total Pages": total_pages,
+            "Current page": current_page,
+            "All books": results,
+            "Previous page": prev_num,
+            "Next page": next_num
+               }, 200
 
 
 class SingleBook(Resource):
@@ -264,13 +286,31 @@ class BorrowHistory(Resource):
 
     def get(self, current_user):
         """It returns the users borrowing history"""
-        user_id = current_user.user_id
-        all_borrowed_books = Borrow.query.filter_by(user_id=user_id)
+        args = get_parser.parse_args()
+        page = args['page']
+        limit = args['limit']
+        all_borrowed_books = Borrow.query.filter_by(user_id=current_user.user_id)\
+            .paginate(page=page, per_page=limit)
+        all_borrowed = all_borrowed_books.items
+        num_results = all_borrowed_books.total
+        num_pages = all_borrowed_books.pages
+        current_page = all_borrowed_books.page
+        has_next_page = all_borrowed_books.has_next
+        has_prev_page = all_borrowed_books.has_prev
+        prev_num = all_borrowed_books.prev_num
+        next_num = all_borrowed_books.next_num
         if not all_borrowed_books:
             return {"Message": "You have not borrowed any book."}, 404
         results = [user_borrows.borrow_serializer()
-                   for user_borrows in all_borrowed_books]
-        return {"The list of books borrowed are ": results}
+                   for user_borrows in all_borrowed]
+        return {
+            "Total results": num_results,
+            "Number of pages": num_pages,
+            "Current page": current_page,
+            "All borrowed books": results,
+            "Previous page": prev_num,
+            "Next page": next_num
+               }, 200
 
 
 class UnReturnedBooks(Resource):
@@ -279,12 +319,27 @@ class UnReturnedBooks(Resource):
 
     def get(self, current_user):
         """User history of books not yet returned"""
-        returned = False
-        un_returned_books = Borrow.query.filter_by(returned=returned)
-        # un_returned_books = Borrow.query.filter(Borrow.returned.is_(False)).first()
+        args = get_parser.parse_args()
+        page = args['page']
+        limit = args['limit']
+        un_returned_books = Borrow.query.filter_by(user_id=current_user.user_id, returned=False).\
+            paginate(page=page, per_page=limit)
+        total_un_returned = un_returned_books.items
+        num_results = un_returned_books.total
+        num_pages = un_returned_books.pages
+        current_page = un_returned_books.page
+        has_next_page = un_returned_books.has_next
+        has_prev_page = un_returned_books.has_prev
+        prev_num = un_returned_books.prev_num
+        next_num = un_returned_books.next_num
         if not un_returned_books:
             return {"Message": "You do not have books that are un-returned"}, 404
-        results = [user_unreturn.borrow_serializer() for user_unreturn in un_returned_books]
-        return {"Here is unreturned books ": results}, 200
-
-
+        results = [user_unreturn.borrow_serializer() for user_unreturn in total_un_returned]
+        return {
+            "Total unreturned books": num_results,
+            "Total pages": num_pages,
+            "Current page": current_page,
+            "Unreturned books": results,
+            "Previous page": prev_num,
+            "Next page": next_num
+               }, 200
