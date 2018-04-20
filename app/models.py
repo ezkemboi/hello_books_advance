@@ -88,14 +88,16 @@ class Book(db.Model):
     book_title = db.Column(db.String)
     authors = db.Column(db.String)
     year = db.Column(db.String)
+    copies = db.Column(db.Integer)
     borrows = db.relationship('Borrow', backref='book', lazy='dynamic')
 
-    def __init__(self, book_id, book_title, authors, year):
+    def __init__(self, book_id, book_title, authors, year, copies):
         """This method initializes book details"""
         self.book_id = book_id
         self.book_title = book_title
         self.authors = authors
         self.year = year
+        self.copies = copies
 
     def __repr__(self):
         """Represent object instance on query"""
@@ -107,7 +109,8 @@ class Book(db.Model):
             'book_id': self.book_id,
             'book_title': self.book_title,
             'authors': self.authors,
-            'year': self.year
+            'year': self.year,
+            'copies': self.copies
         }
         return book_details
 

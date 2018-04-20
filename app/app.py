@@ -24,12 +24,13 @@ add_book_parser = reqparse.RequestParser()
 add_book_parser.add_argument('book_title', type=str, help='Please enter the book title', required=True)
 add_book_parser.add_argument('authors', type=str, help='Please enter the authors name', required=True)
 add_book_parser.add_argument('year', type=int, help='Please enter the year published')
+add_book_parser.add_argument('copies', type=int, help='Enter no of copies')
 
 edit_book_parser = add_book_parser.copy()
 delete_book_parser = reqparse.RequestParser()
 
 get_parser = reqparse.RequestParser()
-get_parser.add_argument('page', type=int, help="Please enter page", default=2)
+get_parser.add_argument('page', type=int, help="Please enter page", default=1)
 get_parser.add_argument('limit', type=int, help="Please enter page limit", default=5)
 
 
@@ -43,12 +44,12 @@ def token_required(function):
         if auth_header:
             token = auth_header
         if not token:
-            return {"Error": "Token is missing. Please provide a valid token"}, 401
+            return {"Message": "Token is missing. Please provide a valid token"}, 401
         try:
             response = User.decode_token(token)
             current_user = User.query.filter_by(user_id=response).first()
         except Exception:
-            return {"Error": "please login again"}, 401
+            return {"Message": "Expired token, please login in again"}, 401
         return function(current_user, *args, **kwargs)
     return wrapper
 
@@ -132,7 +133,6 @@ class UserLogout(Resource):
                         return {"Error": "Internal server error"}, 500
 
             return {"Message": "No valid token found"}, 401
-        return {"Error": "Internal server error"}, 500
 
 
 class ResetPassword(Resource):
@@ -165,19 +165,24 @@ class AddBook(Resource):
     def post(self, current_user):
         """Post method to allow addition of book"""
         args = add_book_parser.parse_args()
-        book_id = random.randint(1111, 9999)
+        # book_id = random.randint(1111, 9999)
         book_title = args['book_title']
         authors = args['authors']
         year = args['year']
-        existing_id = Book.query.filter_by(book_id=book_id).first()
+        copies = args['copies']
+        # existing_id = Book.query.filter_by(book_id=book_id).first()
         if not book_title or not authors:
             return {"Message": "Please fill all the details."}, 400
-        if existing_id:
-            return {"Message": "A book with that id already exist."}, 400
-        new_book = Book(book_id=book_id, book_title=book_title, authors=authors, year=year)
-        new_book.save_book()
-        result = new_book.book_serializer()
-        return {"Message": "The book was added successfully.", "Book Added": result}, 201
+        # if existing_id:
+        #     return {"Message": "A book with that id already exist."}, 400
+        book_copies = 0
+        while book_copies < copies:
+            book_copies += 1
+            new_book = Book(book_id=random.randint(1111, 9999), book_title=book_title, authors=authors,
+                            year=year, copies=book_copies)
+            new_book.save_book()
+            result = new_book.book_serializer()
+            return {"Message": "The book was added successfully.", "Book Added": result}, 201
 
     def get(self):
         """Get method to get all books"""
@@ -289,8 +294,9 @@ class BorrowHistory(Resource):
         args = get_parser.parse_args()
         page = args['page']
         limit = args['limit']
-        all_borrowed_books = Borrow.query.filter_by(user_id=current_user.user_id)\
-            .paginate(page=page, per_page=limit)
+        all_borrowed_books = Borrow.query.filter_by(
+            user_id=current_user.user_id).paginate(
+            page=page, per_page=limit)
         all_borrowed = all_borrowed_books.items
         num_results = all_borrowed_books.total
         num_pages = all_borrowed_books.pages
@@ -322,7 +328,7 @@ class UnReturnedBooks(Resource):
         args = get_parser.parse_args()
         page = args['page']
         limit = args['limit']
-        un_returned_books = Borrow.query.filter_by(user_id=current_user.user_id, returned=False).\
+        un_returned_books = Borrow.query.filter_by(returned=False).\
             paginate(page=page, per_page=limit)
         total_un_returned = un_returned_books.items
         num_results = un_returned_books.total
