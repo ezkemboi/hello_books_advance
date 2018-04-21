@@ -20,16 +20,6 @@ class User(db.Model):
     password = db.Column(db.String)
     borrows = db.relationship('Borrow', backref='user', lazy='dynamic')
 
-    def __init__(self, user_id, email, username, password):
-        """This method initializes the required items"""
-        self.user_id = user_id
-        self.email = email
-        self.username = username
-        self.password = password
-
-    def __repr__(self):
-        return "<User_id {}>".format(self.user_id)
-
     def user_serializer(self):
         """Serialize the user data"""
         user_details = {
@@ -91,18 +81,6 @@ class Book(db.Model):
     copies = db.Column(db.Integer)
     borrows = db.relationship('Borrow', backref='book', lazy='dynamic')
 
-    def __init__(self, book_id, book_title, authors, year, copies):
-        """This method initializes book details"""
-        self.book_id = book_id
-        self.book_title = book_title
-        self.authors = authors
-        self.year = year
-        self.copies = copies
-
-    def __repr__(self):
-        """Represent object instance on query"""
-        return "<Book_id {}>".format(self.book_id)
-
     def book_serializer(self):
         """This is a serialized book details stored in dict"""
         book_details = {
@@ -140,19 +118,6 @@ class Borrow(db.Model):
     due_date = db.Column(db.DateTime)
     return_time = db.Column(db.DateTime)
     returned = db.Column(db.Boolean)
-
-    def __init__(self, borrow_id, user_id, book_id, returned, date_borrowed, due_date):
-        """Initialize borrow details"""
-        self.borrow_id = borrow_id
-        self.user_id = user_id
-        self.book_id = book_id
-        self.returned = returned
-        self.date_borrowed = date_borrowed
-        self.due_date = due_date
-
-    def __repr__(self):
-        """Represent object instance on query"""
-        return "<Borrow_id {}>".format(self.borrow_id)
 
     def borrow_serializer(self):
         """Serialize data for borrow"""
