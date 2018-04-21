@@ -110,7 +110,7 @@ class UserLogin(Resource):
         if check_password_hash(log_in_user.password, password):
             access_token = log_in_user.generate_token(log_in_user.user_id)
             if access_token:
-                return {'Message': "Successfully logged in.", "Access_token": access_token}, 200
+                return {'Message': "Successfully logged in.", "Access_token": access_token.decode()}, 200
 
 
 class UserLogout(Resource):
@@ -166,7 +166,6 @@ class AddBook(Resource):
     def post(self, current_user):
         """Post method to allow addition of book"""
         args = add_book_parser.parse_args()
-        book_id = random.randint(1111, 9999)
         book_title = args['book_title']
         authors = args['authors']
         year = args['year']
@@ -174,13 +173,13 @@ class AddBook(Resource):
         if not book_title or not authors:
             return {"Message": "Please fill all the details."}, 400
         book_copies = 0
-        while book_copies <= copies:
+        while book_copies < copies:
             book_copies += 1
-            new_book = Book(book_id=book_id, book_title=book_title, authors=authors,
+            new_book = Book(book_id=random.randint(1111, 9999), book_title=book_title, authors=authors,
                             year=year, copies=book_copies)
             new_book.save_book()
             result = new_book.book_serializer()
-            return {"Message": "The book was added successfully.", "Book Added": result}, 201
+        return {"Message": "The book was added successfully.", "Book Added": result}, 201
 
     def get(self):
         """Get method to get all books"""
@@ -263,7 +262,7 @@ class BorrowBook(Resource):
         available_book = Book.query.filter_by(book_id=book_id).first()
         returned = False
         date_borrowed = datetime.datetime.now()
-        due_date = date_borrowed + datetime.timedelta(days=14)
+        due_date = datetime.datetime.now() + datetime.timedelta(days=14)
         if available_book:
             if available_book.copies >= 1:
                 borrow_book = Borrow(borrow_id=random.randint(1111, 9999),

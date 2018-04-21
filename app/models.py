@@ -161,8 +161,6 @@ class Borrow(db.Model):
             'book_id': self.book_id,
             'user_id': self.user_id,
             'returned': self.returned,
-            'date_borrowed': self.date_borrowed,
-            'due_date': self.due_date
         }
         return borrow_details
 
