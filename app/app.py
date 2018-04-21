@@ -3,6 +3,7 @@ This file holds all the resources for user from registration to borrow books and
 """
 import re
 from flask import render_template, request
+import datetime
 from functools import wraps
 from flask_restful import Resource, reqparse
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -30,8 +31,8 @@ edit_book_parser = add_book_parser.copy()
 delete_book_parser = reqparse.RequestParser()
 
 get_parser = reqparse.RequestParser()
-get_parser.add_argument('page', type=int, help="Please enter page", default=1)
-get_parser.add_argument('limit', type=int, help="Please enter page limit", default=5)
+get_parser.add_argument('page', type=int, help="Please enter page")
+get_parser.add_argument('limit', type=int, help="Please enter page limit")
 
 
 def token_required(function):
@@ -109,7 +110,7 @@ class UserLogin(Resource):
         if check_password_hash(log_in_user.password, password):
             access_token = log_in_user.generate_token(log_in_user.user_id)
             if access_token:
-                return {'Message': "Successfully logged in.", "Access_token": access_token.decode()}, 200
+                return {'Message': "Successfully logged in.", "Access_token": access_token}, 200
 
 
 class UserLogout(Resource):
@@ -165,20 +166,17 @@ class AddBook(Resource):
     def post(self, current_user):
         """Post method to allow addition of book"""
         args = add_book_parser.parse_args()
-        # book_id = random.randint(1111, 9999)
+        book_id = random.randint(1111, 9999)
         book_title = args['book_title']
         authors = args['authors']
         year = args['year']
         copies = args['copies']
-        # existing_id = Book.query.filter_by(book_id=book_id).first()
         if not book_title or not authors:
             return {"Message": "Please fill all the details."}, 400
-        # if existing_id:
-        #     return {"Message": "A book with that id already exist."}, 400
         book_copies = 0
-        while book_copies < copies:
+        while book_copies <= copies:
             book_copies += 1
-            new_book = Book(book_id=random.randint(1111, 9999), book_title=book_title, authors=authors,
+            new_book = Book(book_id=book_id, book_title=book_title, authors=authors,
                             year=year, copies=book_copies)
             new_book.save_book()
             result = new_book.book_serializer()
@@ -220,18 +218,18 @@ class SingleBook(Resource):
     def put(self, current_user, book_id):
         """Put method to edit already existing book"""
         args = edit_book_parser.parse_args()
-        if not book_id:
-            return {"Message": "The book is not found."}, 404
         get_book = Book.query.filter_by(book_id=book_id).first()
         book_title = args['book_title']
         authors = args['authors']
         year = args['year']
+        copies = args['copies']
         if not get_book:
             return {"The book is not found"}, 404
         if get_book:
             get_book.book_title = book_title
             get_book.authors = authors
             get_book.year = year
+            get_book.copies = copies
             get_book.update_book()
             edited_book = get_book.book_serializer()
             return {"Success": edited_book}, 200
@@ -264,13 +262,18 @@ class BorrowBook(Resource):
         """Post method for user to borrow book"""
         available_book = Book.query.filter_by(book_id=book_id).first()
         returned = False
+        date_borrowed = datetime.datetime.now()
+        due_date = date_borrowed + datetime.timedelta(days=14)
         if available_book:
-            borrow_book = Borrow(borrow_id=random.randint(1111, 9999),
-                                 book_id=book_id, user_id=current_user.user_id, returned=returned)
-            borrow_book.save_borrowed_book()
-            result = borrow_book.borrow_serializer()
-            return {"Book borrowed": result}, 200
-        return {"Message": "The book with that id is not found"}, 404
+            if available_book.copies >= 1:
+                borrow_book = Borrow(borrow_id=random.randint(1111, 9999),
+                                     book_id=book_id, user_id=current_user.user_id, returned=returned,
+                                     date_borrowed=date_borrowed, due_date=due_date)
+                Book.copies -= 1
+                borrow_book.save_borrowed_book()
+                result = borrow_book.borrow_serializer()
+                return {"Book borrowed": result}, 200
+            return {"Message": "The book with that id is not found"}, 404
 
     def put(self, current_user, book_id):
         """Put method to allow user return book"""
@@ -278,6 +281,8 @@ class BorrowBook(Resource):
         if return_book:
             return_book.user_id = current_user.user_id
             return_book.returned = True
+            return_book.return_time = datetime.datetime.now()
+            Book.copies += 1
             return_book.return_borrowed_book()
             return {"Message": "You have returned the book successfully."}, 200
         return {"Message": "Your trying to return unidentified book"}, 400

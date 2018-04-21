@@ -136,14 +136,19 @@ class Borrow(db.Model):
     borrow_id = db.Column(db.Integer, primary_key=True, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
     book_id = db.Column(db.Integer, db.ForeignKey(Book.book_id))
+    date_borrowed = db.Column(db.DateTime)
+    due_date = db.Column(db.DateTime)
+    return_time = db.Column(db.DateTime)
     returned = db.Column(db.Boolean)
 
-    def __init__(self, borrow_id, user_id, book_id, returned):
+    def __init__(self, borrow_id, user_id, book_id, returned, date_borrowed, due_date):
         """Initialize borrow details"""
         self.borrow_id = borrow_id
         self.user_id = user_id
         self.book_id = book_id
         self.returned = returned
+        self.date_borrowed = date_borrowed
+        self.due_date = due_date
 
     def __repr__(self):
         """Represent object instance on query"""
@@ -155,7 +160,9 @@ class Borrow(db.Model):
             'borrow_id': self.borrow_id,
             'book_id': self.book_id,
             'user_id': self.user_id,
-            'returned': self.returned
+            'returned': self.returned,
+            'date_borrowed': self.date_borrowed,
+            'due_date': self.due_date
         }
         return borrow_details
 
