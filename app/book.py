@@ -1,9 +1,14 @@
 from flask_restful import Resource
 import random
 
-from .models import Book
+from .models import Book, User
 from .user import token_required
 from .parsers import add_book_parser, get_parser, edit_book_parser
+
+
+def check_admin():
+    """Check if user is an admin"""
+    return User.query.filter(User.email.endswith('@hellobookslibrary.com')).all()
 
 
 class AddBook(Resource):
@@ -18,6 +23,9 @@ class AddBook(Resource):
         authors = args['authors']
         year = args['year']
         copies = args['copies']
+        admin = check_admin()
+        if not admin:
+            return {"Message": "Only admin can add a book."}
         if not book_title or not authors:
             return {"Message": "Please fill all the details."}, 400
         book_copies = 0
@@ -70,6 +78,9 @@ class SingleBook(Resource):
         authors = args['authors']
         year = args['year']
         copies = args['copies']
+        admin = check_admin()
+        if not admin:
+            return {"Message": "Only admin can edit a book."}
         if not get_book:
             return {"The book is not found"}, 404
         if get_book:
@@ -85,6 +96,9 @@ class SingleBook(Resource):
     def delete(self, current_user, book_id):
         """Delete method to delete a single book"""
         get_book_id = Book.query.filter_by(book_id=book_id).first()
+        admin = check_admin()
+        if not admin:
+            return {"Message": "Admin can only delete a book."}
         if get_book_id:
             get_book_id.delete_book()
             return {"Message": "The book was deleted successfully."}

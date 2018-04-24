@@ -15,9 +15,9 @@ class User(db.Model):
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, primary_key=True, unique=True)
-    email = db.Column(db.String, unique=True)
-    username = db.Column(db.String, unique=True)
-    password = db.Column(db.String)
+    email = db.Column(db.String, unique=True, nullable=False)
+    username = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String, nullable=False)
     borrows = db.relationship('Borrow', backref='user', lazy='dynamic')
 
     def user_serializer(self):
@@ -74,9 +74,9 @@ class Book(db.Model):
 
     __tablename__ = 'books'
 
-    book_id = db.Column(db.Integer, primary_key=True, unique=True)
-    book_title = db.Column(db.String)
-    authors = db.Column(db.String)
+    book_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    book_title = db.Column(db.String, nullable=False)
+    authors = db.Column(db.String, nullable=False)
     year = db.Column(db.String)
     copies = db.Column(db.Integer)
     borrows = db.relationship('Borrow', backref='book', lazy='dynamic')
@@ -111,7 +111,7 @@ class Borrow(db.Model):
     """Class holding the models for borrow and history"""
     __tablename__ = 'borrows'
 
-    borrow_id = db.Column(db.Integer, primary_key=True, unique=True)
+    borrow_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
     book_id = db.Column(db.Integer, db.ForeignKey(Book.book_id))
     date_borrowed = db.Column(db.DateTime)
