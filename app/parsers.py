@@ -13,7 +13,7 @@ reset_password_parser = login_parser.copy()
 add_book_parser = reqparse.RequestParser()
 add_book_parser.add_argument('book_title', type=str, help='Please enter the book title', required=True)
 add_book_parser.add_argument('authors', type=str, help='Please enter the authors name', required=True)
-add_book_parser.add_argument('year', type=int, help='Please enter the year published')
+add_book_parser.add_argument('year', help='Please enter the year published')
 add_book_parser.add_argument('copies', type=int, help='Enter no of copies')
 
 edit_book_parser = add_book_parser.copy()

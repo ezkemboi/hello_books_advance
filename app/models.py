@@ -77,8 +77,8 @@ class Book(db.Model):
     book_id = db.Column(db.Integer, primary_key=True, nullable=False)
     book_title = db.Column(db.String, nullable=False)
     authors = db.Column(db.String, nullable=False)
-    year = db.Column(db.String)
-    copies = db.Column(db.Integer)
+    year = db.Column(db.Integer, nullable=False)
+    copies = db.Column(db.Integer, nullable=False)
     borrows = db.relationship('Borrow', backref='book', lazy='dynamic')
 
     def book_serializer(self):
@@ -117,7 +117,7 @@ class Borrow(db.Model):
     date_borrowed = db.Column(db.DateTime)
     due_date = db.Column(db.DateTime)
     return_time = db.Column(db.DateTime)
-    returned = db.Column(db.Boolean)
+    returned = db.Column(db.Boolean, nullable=False)
 
     def borrow_serializer(self):
         """Serialize data for borrow"""

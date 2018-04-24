@@ -25,17 +25,25 @@ class AddBook(Resource):
         copies = args['copies']
         admin = check_admin()
         if not admin:
-            return {"Message": "Only admin can add a book."}
+            return {"Message": "Only admin can add a book."}, 401
         if not book_title or not authors:
             return {"Message": "Please fill all the details."}, 400
-        book_copies = 0
-        while book_copies < copies:
-            book_copies += 1
+        check_if_available = Book.query.filter_by(book_title=book_title, authors=authors, year=year).first()
+        if check_if_available is None:
             new_book = Book(book_id=random.randint(1111, 9999), book_title=book_title, authors=authors,
-                            year=year, copies=book_copies)
+                            year=year, copies=copies)
             new_book.save_book()
             result = new_book.book_serializer()
-        return {"Message": "The book was added successfully.", "Book Added": result}, 201
+            return {"Message": "The book was added successfully.", "Book Added": result}, 201
+        check_if_available.copies += copies
+        check_if_available.update_book()
+        return {"Message": "The book exist and was updated", "Details": {
+            'book_id': check_if_available.book_id,
+            'book_title': check_if_available.book_title,
+            'authors': check_if_available.authors,
+            'year': check_if_available.year,
+            'copies': check_if_available.copies
+        }}, 200
 
     def get(self):
         """Get method to get all books"""
