@@ -9,13 +9,6 @@ from tests.BaseTests import HelloBooksTestCase
 class BooksTestCase(HelloBooksTestCase):
     """This class contains all tests for users"""
 
-    def add_book(self):
-        """This method adds a book"""
-        self.authenticate_user()
-
-        return self.client.post('/api/v1/books', data=json.dumps(self.add_book_data),
-                                content_type='application/json')
-
     # def test_add_book(self):
     #     """Test that admin should add book"""
     #     self.authenticate_user()

@@ -16,7 +16,7 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, primary_key=True, unique=True)
     email = db.Column(db.String, unique=True, nullable=False)
-    username = db.Column(db.String, unique=True, nullable=False)
+    username = db.Column(db.String, unique=True)
     password = db.Column(db.String, nullable=False)
     borrows = db.relationship('Borrow', backref='user', lazy='dynamic')
 
