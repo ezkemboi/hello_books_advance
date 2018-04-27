@@ -33,7 +33,8 @@ class BorrowBook(Resource):
                 return {"Message": "You can borrow only up to 3 books."}
             borrow_book = Borrow(borrow_id=random.randint(1111, 9999),
                                  book_id=book_id, user_id=current_user.user_id, returned=returned,
-                                 date_borrowed=date_borrowed, due_date=due_date)
+                                 date_borrowed=date_borrowed, due_date=due_date, isnb=available_book.isnb,
+                                 book_title=available_book.book_title)
             available_book.copies -= 1
             borrow_book.save_borrowed_book()
             result = borrow_book.borrow_serializer()

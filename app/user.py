@@ -48,17 +48,24 @@ class UserRegistration(Resource):
         email = args['email']
         username = args['username']
         password = args['password']
-        user = User.query.filter_by(email=email).first()
+        tel_no = args['tel_no']
+        city = args['city']
+        profession = args['profession']
+        address = args['address']
+        prof_img = args['prof_img']
+        DOB = args['d.o.b']
+        about_you = args['desc']
+        registered_user = User.query.filter_by(email=email).first()
         valid_email = re.match("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email.strip())
         valid_username = re.match("[A-Za-z0-9@#$%^&+=]{4,}", username.strip())
         password_length = re.match("[A-Za-z0-9@#$%^&+=]{8,}", password.strip())
         hashed_password = generate_password_hash(password, method='sha256')
-        if not email or not username or not password:
-            return {"Message": "Provide email, username and password!"}, 400
+        if not (email, password, username, password, tel_no, DOB, address, prof_img):
+            return {"Message": "Fill all the fields required."}, 400
         username = User.query.filter_by(username=username).first()
-        if username:
+        if username is not None:
             return {"Message": "The username is already taken!"}, 409
-        if user:
+        if registered_user is not None:
             return {"Message": "The user is already registered."}, 422
         if not valid_email:
             return {"Message": "Please provide a valid email!"}, 400
@@ -68,7 +75,8 @@ class UserRegistration(Resource):
             return {"Message": "Password is short!"}, 400
         else:
             create_user = User(user_id=random.randint(1111, 9999), email=email, username=username,
-                               password=hashed_password)
+                               password=hashed_password, tel_no=tel_no, city=city, profession=profession,
+                               address=address, prof_img=prof_img, DOB=DOB, about_you=about_you)
             create_user.save_user()
             return {"Message": "The User is successfully Registered."}, 201
 

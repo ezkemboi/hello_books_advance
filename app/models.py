@@ -14,10 +14,17 @@ class User(db.Model):
     """
     __tablename__ = 'users'
 
-    user_id = db.Column(db.Integer, primary_key=True, unique=True)
+    user_id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True, nullable=False)
-    username = db.Column(db.String, unique=True)
+    username = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
+    tel_no = db.Column(db.String)
+    profession = db.Column(db.String)
+    address = db.Column(db.String)
+    city = db.Column(db.String)
+    prof_img = db.Column(db.LargeBinary)
+    DOB = db.Column(db.DateTime)
+    about_you = db.Column(db.String)
     borrows = db.relationship('Borrow', backref='user', lazy='dynamic')
 
     def user_serializer(self):
@@ -26,7 +33,13 @@ class User(db.Model):
             'user_id': self.user_id,
             'email': self.email,
             'username': self.username,
-            'password': self.password
+            'password': self.password,
+            'tel_no': self.tel_no,
+            'profession': self.profession,
+            'address': self.address,
+            'prof_img': self.prof_img,
+            'DOB': self.DOB,
+            'about_you': self.about_you
         }
         return user_details
 
@@ -74,11 +87,15 @@ class Book(db.Model):
 
     __tablename__ = 'books'
 
-    book_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    book_id = db.Column(db.Integer, primary_key=True)
     book_title = db.Column(db.String, nullable=False)
     authors = db.Column(db.String, nullable=False)
     year = db.Column(db.Integer, nullable=False)
     copies = db.Column(db.Integer, nullable=False)
+    edition = db.Column(db.String)
+    publisher = db.Column(db.String)
+    isnb = db.Column(db.Integer)
+    book_cover = db.Column(db.LargeBinary)
     borrows = db.relationship('Borrow', backref='book', lazy='dynamic')
 
     def book_serializer(self):
@@ -88,7 +105,11 @@ class Book(db.Model):
             'book_title': self.book_title,
             'authors': self.authors,
             'year': self.year,
-            'copies': self.copies
+            'copies': self.copies,
+            'edition': self.edition,
+            'publisher': self.publisher,
+            'isnb': self.isnb,
+            'book_cover': self.book_cover
         }
         return book_details
 
@@ -114,6 +135,8 @@ class Borrow(db.Model):
     borrow_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
     book_id = db.Column(db.Integer, db.ForeignKey(Book.book_id))
+    isnb = db.Column(db.Integer, db.ForeignKey(Book.isnb))
+    book_title = db.Column(db.String, db.ForeignKey(Book.book_title))
     date_borrowed = db.Column(db.DateTime)
     due_date = db.Column(db.DateTime)
     return_time = db.Column(db.DateTime)
@@ -126,6 +149,8 @@ class Borrow(db.Model):
             'book_id': self.book_id,
             'user_id': self.user_id,
             'returned': self.returned,
+            'book_title': self.book_title,
+            'isnb': self.isnb
         }
         return borrow_details
 
