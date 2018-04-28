@@ -4,7 +4,7 @@ from flask import request
 import random
 
 from .user import token_required
-from .models import Book, Borrow
+from .models import Book, Borrow, Plan
 from .parsers import get_parser
 
 
@@ -26,19 +26,49 @@ class BorrowBook(Resource):
         available_book = Book.query.filter_by(book_id=book_id).first()
         returned = False
         date_borrowed = datetime.datetime.now()
-        due_date = datetime.datetime.now() + datetime.timedelta(days=14)
         if available_book.copies >= 1:
-            books_borrowed = user_un_returned_books()
-            if len(books_borrowed) > 3:
-                return {"Message": "You can borrow only up to 3 books."}
+            user_plan = Plan.query.filter_by(user_id=current_user.user_id, expiry=current_user.expiry).first()
             borrow_book = Borrow(borrow_id=random.randint(1111, 9999),
                                  book_id=book_id, user_id=current_user.user_id, returned=returned,
-                                 date_borrowed=date_borrowed, due_date=due_date, isnb=available_book.isnb,
+                                 date_borrowed=date_borrowed, isnb=available_book.isnb,
                                  book_title=available_book.book_title)
-            available_book.copies -= 1
-            borrow_book.save_borrowed_book()
-            result = borrow_book.borrow_serializer()
-            return {"Book borrowed": result}, 200
+            if user_plan.limited_monthly_3 == 'true':
+                books_borrowed = user_un_returned_books
+                if len(books_borrowed) > 3:
+                    return {"Message": "You can borrowed maximum number of books."}, 403
+                borrow_book.due_date = user_plan.expiry
+                available_book.copies -= 1
+                borrow_book.save_borrowed_book()
+                result = borrow_book.borrow_serializer()
+                return {"Book borrowed": result}, 200
+            elif user_plan.limited_monthly_6 == 'true':
+                books_borrowed = user_un_returned_books()
+                if len(books_borrowed) > 6:
+                    return {"Message": "You can borrow up to 6 books at a time."}, 403
+                borrow_book.due_date = user_plan.expiry
+                available_book.copies -= 1
+                borrow_book.save_borrowed_book()
+                result = borrow_book.borrow_serializer()
+                return {"Book borrowed": result}, 200
+            elif user_plan.limited_monthly_3 == 'true' or user_plan.unlimited_yearly_3 == 'true':
+                books_borrowed = user_un_returned_books()
+                if len(books_borrowed) > 3:
+                    return {"Message": "You can borrow up to 3 books per time."}, 403
+                borrow_book.due_date = user_plan.expiry
+                available_book.copies -= 1
+                borrow_book.save_borrowed_book()
+                result = borrow_book.borrow_serializer()
+                return {"Book borrowed": result}, 200
+
+            elif user_plan.unlimited_monthly_6 == 'true' or user_plan.unlimited_yearly_6 == 'true':
+                books_borrowed = user_un_returned_books()
+                if len(books_borrowed) > 6:
+                    return {"Message": "You can borrow up to 6 books at a time."}, 403
+                borrow_book.due_date = user_plan.expiry
+                available_book.copies -= 1
+                borrow_book.save_borrowed_book()
+                result = borrow_book.borrow_serializer()
+                return {"Book borrowed": result}, 200
         return {"Message": "The book is not available for borrow."}, 404
 
     def put(self, current_user, book_id):

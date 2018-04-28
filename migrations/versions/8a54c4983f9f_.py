@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 6b48b455cc5c
+Revision ID: 8a54c4983f9f
 Revises: 
-Create Date: 2018-04-27 23:11:46.201837
+Create Date: 2018-04-28 10:04:14.272777
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6b48b455cc5c'
+revision = '8a54c4983f9f'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -55,15 +55,11 @@ def upgrade():
     sa.Column('borrow_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('book_id', sa.Integer(), nullable=True),
-    sa.Column('isnb', sa.Integer(), nullable=True),
-    sa.Column('book_title', sa.String(), nullable=True),
     sa.Column('date_borrowed', sa.DateTime(), nullable=True),
     sa.Column('due_date', sa.DateTime(), nullable=True),
     sa.Column('return_time', sa.DateTime(), nullable=True),
     sa.Column('returned', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['book_id'], ['books.book_id'], ),
-    sa.ForeignKeyConstraint(['book_title'], ['books.book_title'], ),
-    sa.ForeignKeyConstraint(['isnb'], ['books.isnb'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('borrow_id')
     )

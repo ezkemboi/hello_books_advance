@@ -26,6 +26,7 @@ class User(db.Model):
     DOB = db.Column(db.DateTime)
     about_you = db.Column(db.String)
     borrows = db.relationship('Borrow', backref='user', lazy='dynamic')
+    plans = db.relationship('Plan', backref='user', lazy='dynamic')
 
     def user_serializer(self):
         """Serialize the user data"""
@@ -49,7 +50,7 @@ class User(db.Model):
         db.session.commit()
 
     def update_user(self):
-        db.session.commit()
+        db.session.commit(self)
 
     def generate_token(self, user_id):
         """Generate token for user authentication"""
@@ -125,7 +126,7 @@ class Book(db.Model):
 
     def update_book(self):
         """Update a book edited by the admin"""
-        db.session.commit()
+        db.session.commit(self)
 
 
 class Borrow(db.Model):
@@ -135,8 +136,6 @@ class Borrow(db.Model):
     borrow_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
     book_id = db.Column(db.Integer, db.ForeignKey(Book.book_id))
-    isnb = db.Column(db.Integer, db.ForeignKey(Book.isnb))
-    book_title = db.Column(db.String, db.ForeignKey(Book.book_title))
     date_borrowed = db.Column(db.DateTime)
     due_date = db.Column(db.DateTime)
     return_time = db.Column(db.DateTime)
@@ -160,7 +159,39 @@ class Borrow(db.Model):
         db.session.commit()
 
     def return_borrowed_book(self):
+        db.session.commit(self)
+
+
+class Plan(db.Model):
+    """Plans that user subscribe to"""
+    __tablename__ = 'plans'
+    plan_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
+    limited_monthly_3 = db.Column(db.Boolean, nullable=True, default=False)
+    limited_monthly_6 = db.Column(db.Boolean, nullable=True, default=False)
+    unlimited_monthly_3 = db.Column(db.Boolean, nullable=True, default=False)
+    unlimited_monthly_6 = db.Column(db.Boolean, nullable=True, default=False)
+    limited_yearly_3 = db.Column(db.Boolean, nullable=True, default=False)
+    limited_yearly_6 = db.Column(db.Boolean, nullable=True, default=False)
+    unlimited_yearly_3 = db.Column(db.Boolean, nullable=True, default=False)
+    unlimited_yearly_6 = db.Column(db.Boolean, nullable=True, default=False)
+    expiry = db.Column(db.DateTime)
+    payment_date = db.Column(db.DateTime)
+    charges = db.Column(db.Float)
+
+    def save_plans(self):
+        """Save user plans"""
+        db.session.add(self)
         db.session.commit()
+
+    def delete_plans(self):
+        """Unsubscribe plans"""
+        db.session.delete(self)
+        db.session.commit()
+
+    def update_plans(self):
+        """Upgrade or downgrade of plans"""
+        db.session.commit(self)
 
 
 class BlacklistToken(db.Model):

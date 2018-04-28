@@ -33,3 +33,7 @@ get_parser = reqparse.RequestParser()
 get_parser.add_argument('page', type=int, help="Please enter page")
 get_parser.add_argument('limit', type=int, help="Please enter page limit")
 get_parser.add_argument('returned', type=bool)
+
+plans_parser = reqparse.RequestParser()
+plans_parser.add_argument('plan', type=str, help='Enter the plan you want to subscribe')
+plans_parser.add_argument('category', type=str, help='Enter category of your plan')

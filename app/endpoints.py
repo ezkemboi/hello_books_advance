@@ -3,6 +3,7 @@ from app import api
 from .user import UserLogin, UserLogout, UserRegistration, ResetPassword
 from .book import AddBook, SingleBook
 from .borrow import BorrowHistory, BorrowBook
+from .plans import UserPlans
 
 # The registration of all endpoints
 api.add_resource(UserRegistration, '/auth/register/')
@@ -15,3 +16,4 @@ api.add_resource(SingleBook, '/books/<book_id>/')
 
 api.add_resource(BorrowBook, '/users/books/<book_id>/')
 api.add_resource(BorrowHistory, '/users/books/')
+api.add_resource(UserPlans, '/users/plans/')
