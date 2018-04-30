@@ -13,7 +13,7 @@ class UserPlans(Resource):
     def post(self, current_user, plan, category):
         """User chooses his/her plan according to needs"""
         plan = ['monthly', 'yearly']
-        category = ['bronze', 'silver', 'gold', 'diamond']
+        category = ['gold', 'diamond']
         args = plans_parser.parse_args()
         plan = args['plan']
         category = args['category']
@@ -21,21 +21,7 @@ class UserPlans(Resource):
         monthly_expiry = payment_date + datetime.timedelta(days=30)
         yearly_expiry = payment_date + datetime.timedelta(days=365)
         if plan == 'monthly':
-            if category == 'bronze':
-                charges = 12.49
-                plan = Plan(plan_id=uuid.uuid4(), user_id=current_user.user_id,
-                            limited_monthly_3=True, expiry=monthly_expiry, payment_date=payment_date,
-                            charges=charges)
-                plan.save_plans()
-                return {"Message": "You have subscribed to monthly bronze plan."}, 200
-            elif category == 'silver':
-                charges = 20.99
-                plan = Plan(plan_id=uuid.uuid4(), user_id=current_user.user_id,
-                            limited_monthy_6=True, expiry=monthly_expiry, payment_date=payment_date,
-                            charges=charges)
-                plan.save_plans()
-                return {"Message": "You have subscribed to monthly silver plan."}, 200
-            elif category == 'gold':
+            if category == 'gold':
                 charges = 17.99
                 plan = Plan(plan_id=uuid.uuid4(), user_id=current_user.user_id,
                             unlimited_monthly_3=True, expiry=monthly_expiry, payment_date=payment_date,
@@ -50,21 +36,7 @@ class UserPlans(Resource):
                 plan.save_plans()
                 return {"Message": "You have subscribed to monthly diamond plan."}, 200
         if plan == 'yearly':
-            if category == 'bronze':
-                charges = 124.90
-                plan = Plan(plan_id=uuid.uuid4(), user_id=current_user.user_id,
-                            limited_yearly_3=True, expiry=yearly_expiry, payment_date=payment_date,
-                            charges=charges)
-                plan.save_plans()
-                return {"Message": "You have subscribed to yearly bronze plan."}, 200
-            elif category == 'silver':
-                charges = 209.90
-                plan = Plan(plan_id=uuid.uuid4(), user_id=current_user.user_id,
-                            limited_yearly_6=True, expiry=yearly_expiry, payment_date=payment_date,
-                            charges=charges)
-                plan.save_plans()
-                return {"Message": "You have subscribed to yearly silver plan."}, 200
-            elif category == 'gold':
+            if category == 'gold':
                 charges = 179.90
                 plan = Plan(plan_id=uuid.uuid4(), user_id=current_user.user_id,
                             unlimited_yearly_3=True, expiry=yearly_expiry, payment_date=payment_date,

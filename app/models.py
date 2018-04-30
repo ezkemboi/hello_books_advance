@@ -167,12 +167,8 @@ class Plan(db.Model):
     __tablename__ = 'plans'
     plan_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
-    limited_monthly_3 = db.Column(db.Boolean, nullable=True, default=False)
-    limited_monthly_6 = db.Column(db.Boolean, nullable=True, default=False)
     unlimited_monthly_3 = db.Column(db.Boolean, nullable=True, default=False)
     unlimited_monthly_6 = db.Column(db.Boolean, nullable=True, default=False)
-    limited_yearly_3 = db.Column(db.Boolean, nullable=True, default=False)
-    limited_yearly_6 = db.Column(db.Boolean, nullable=True, default=False)
     unlimited_yearly_3 = db.Column(db.Boolean, nullable=True, default=False)
     unlimited_yearly_6 = db.Column(db.Boolean, nullable=True, default=False)
     expiry = db.Column(db.DateTime)

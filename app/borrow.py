@@ -32,28 +32,10 @@ class BorrowBook(Resource):
                                  book_id=book_id, user_id=current_user.user_id, returned=returned,
                                  date_borrowed=date_borrowed, isnb=available_book.isnb,
                                  book_title=available_book.book_title)
-            if user_plan.limited_monthly_3 == 'true':
-                books_borrowed = user_un_returned_books
-                if len(books_borrowed) > 3:
-                    return {"Message": "You can borrowed maximum number of books."}, 403
-                borrow_book.due_date = user_plan.expiry
-                available_book.copies -= 1
-                borrow_book.save_borrowed_book()
-                result = borrow_book.borrow_serializer()
-                return {"Book borrowed": result}, 200
-            elif user_plan.limited_monthly_6 == 'true':
-                books_borrowed = user_un_returned_books()
-                if len(books_borrowed) > 6:
-                    return {"Message": "You can borrow up to 6 books at a time."}, 403
-                borrow_book.due_date = user_plan.expiry
-                available_book.copies -= 1
-                borrow_book.save_borrowed_book()
-                result = borrow_book.borrow_serializer()
-                return {"Book borrowed": result}, 200
-            elif user_plan.limited_monthly_3 == 'true' or user_plan.unlimited_yearly_3 == 'true':
+            if user_plan.limited_monthly_3 == 'true' or user_plan.unlimited_yearly_3 == 'true':
                 books_borrowed = user_un_returned_books()
                 if len(books_borrowed) > 3:
-                    return {"Message": "You can borrow up to 3 books per time."}, 403
+                    return {"Message": "You can borrow up to 3 books at a time."}, 403
                 borrow_book.due_date = user_plan.expiry
                 available_book.copies -= 1
                 borrow_book.save_borrowed_book()
